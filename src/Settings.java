@@ -1,3 +1,4 @@
+
 import java.util.Scanner;
 import java.io.File;
 
@@ -20,7 +21,7 @@ public class Settings {
         // settings, effectively toggles. If the file does not exist,
         // populate it with the following values (possibly in .json).
         newFileProperties = 0;
-        defaultDirectory = "~/AppData/Local/sudoku/";
+        defaultDirectory = "C:\\Users\\jashton\\AppData\\Local\\Sudoku"; // TODO: This is a Windows default. Need OS detection.
     }
 
     /**

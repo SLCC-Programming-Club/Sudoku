@@ -3,10 +3,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import javax.swing.JPanel;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 
+import gui.ComboBox;
+import gui.FileChooser;
 /**
  * The Nav class represents the Navigation bar at the top of the JFrame window.
  *
@@ -85,26 +86,52 @@ public class Nav extends JPanel {
      * debugging purposes.
      */
     private void createGUI() {
-        JComboBox<String> fileOptions = new JComboBox<String>();
-            fileOptions.addItem("New");
-            fileOptions.addItem("Open");
-            fileOptions.addItem("Save");
-            fileOptions.addItem("Exit");
-            
         JLabel elapsedTime = new JLabel("Elapsed Time: 00:00:00");
-
         JButton solve = new JButton("Solve");
 
-        add(fileOptions);
+        add(createFileOptions());
         add(elapsedTime);
         add(solve);
     }
 
     /**
+     * Create the ComboBox for the file options.
+     * 
+     * @return ComboBox<String>
+     */
+    private ComboBox<String> createFileOptions() {
+        ComboBox<String> fileOptions = new ComboBox<>();
+            fileOptions.addItem("New");
+            fileOptions.addItem("Open");
+            fileOptions.addItem("Save");
+            fileOptions.addItem("Exit");
+
+        fileOptions.addActionListener(e -> {
+            String selected = (String) fileOptions.getSelectedItem();
+            switch(selected) {
+                case "New":
+                    newFile();
+                    break;
+                case "Open":
+                    openFile();
+                    break;
+                case "Save":
+                    saveFile();
+                    break;
+                case "Exit":
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Invalid selection.");
+            }
+        });
+
+        return fileOptions;
+    }
+
+    /**
      * Given the user's selection from the JComboBox, perform the appropriate
      * action.
-     *
-     * @param String
      */
     private void newFile() {
         int defaultOption = s.getNewFileProperties();
@@ -121,7 +148,29 @@ public class Nav extends JPanel {
     }
 
     /**
+     * Open an existing .sdku file in the user's file system, using a GUI.
+     */
+    private void openFile() {
+        File defaultDirectory = new File(s.getDefaultDirectory());
+        if(defaultDirectory != null || !defaultDirectory.isDirectory()) {
+            defaultDirectory.mkdirs();
+        }
+
+        FileChooser fc = new FileChooser(defaultDirectory);
+        int result = fc.showOpenDialog(this);
+
+        if(result == FileChooser.APPROVE_OPTION) {
+            f = fc.getSelectedFile();
+            createGrid(f);
+        } else {
+            System.out.println("No file was selected.");
+        }
+    }
+
+    /**
      * Given an input filename, open the file and populate the grid.
+     * 
+     * This implementation is for use only in the command-line interface. 
      *
      * @param String
      */
@@ -140,6 +189,7 @@ public class Nav extends JPanel {
             return;
         }
 
+        System.out.println("Opening the file " + filename + ".sdku.");
         createGrid(f);
     }
 

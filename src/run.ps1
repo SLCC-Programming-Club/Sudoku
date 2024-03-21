@@ -5,6 +5,7 @@ function Run {
     javac *.java
     java App $flag
     rm *.class
+    rm gui/*.class
 }
 
 if ($args.Length -eq 1) {
