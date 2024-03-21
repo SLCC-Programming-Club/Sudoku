@@ -89,7 +89,7 @@ public class Nav extends JPanel {
      * @param String
      */
     private void openFile(String filename) {
-        File f = new File(/*"spring24/sudoku/" + */filename + ".sdku");
+        File f = new File("resources/" + filename + ".sdku");
         if(f == null || !f.exists() || f.isDirectory() || !f.canRead()) {
             System.out.println(
                     "The file " + filename + 

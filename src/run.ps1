@@ -1,3 +1,3 @@
 javac *.java
-java Sudoku
+java App -c
 rm *.class
