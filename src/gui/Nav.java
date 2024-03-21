@@ -1,14 +1,14 @@
+package gui;
 import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
 
 import javax.swing.JPanel;
+
+import gui.backend.Settings;
+
 import javax.swing.JLabel;
 import javax.swing.JButton;
-
-import gui.ComboBox;
-import gui.FileChooser;
-import gui.Settings;
 /**
  * The Nav class represents the Navigation bar at the top of the JFrame window.
  *

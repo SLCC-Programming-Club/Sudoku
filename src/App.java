@@ -1,8 +1,10 @@
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.UIManager;
 
-import gui.Settings;
+import gui.Nav;
+import gui.Root;
+import gui.backend.Settings;
+import gui.backend.SudokuChecker;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -16,7 +18,7 @@ public class App extends JFrame {
     private Nav nav;
 
     // Data fields
-    private Settings settings;
+    private Settings s;
     private SudokuChecker checker;
 
     /**
@@ -24,8 +26,8 @@ public class App extends JFrame {
      */
     public App() {
         super("Sudoku");
-        settings = new Settings();
-        nav = new Nav(settings, false);
+        s = new Settings();
+        nav = new Nav(s, false);
         initSetup();
         add(createApp());
     }
@@ -38,31 +40,37 @@ public class App extends JFrame {
         //       values from Settings.
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(750, 550));
+        setPreferredSize(s.getDimension());
         setSize(getPreferredSize());
-        setResizable(false);
+        setResizable(s.getResizable());
         setLocationRelativeTo(null);
 
+        // Set the look and feel for the app to be cross-platform.
         try {
             UIManager.setLookAndFeel(
                 UIManager.getCrossPlatformLookAndFeelClassName()
             );
         } catch (Exception e) {
             System.out.println(
-                "Error with cross platform look/feel in frameSetup()."
+                "Error with cross platform look/feel in initSetup()."
             );
         }
     }
 
     /**
-     * Create the root JPanel holding all other GUI components.
+     * Create the Root JPanel for the Sudoku App. This will contain all other
+     * GUI components.
      * 
-     * @return JPanel
+     * Settings must be passed since, in the future, the user may be able to
+     * customize the layout of the app.
+     * 
+     * @param settings
+     * @return Root
      */
-    private JPanel createApp() {
-        // TODO: Create the root JPanel holding all other GUI components.
-        JPanel root = new JPanel();
+    private Root createApp() {
+        Root root = new Root(s);
             root.add(nav);
+
         return root;
     }
 

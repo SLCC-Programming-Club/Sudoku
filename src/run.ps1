@@ -6,6 +6,7 @@ function Run {
     java App $flag
     rm *.class
     rm gui/*.class
+    rm gui/backend/*.class
 }
 
 if ($args.Length -eq 1) {

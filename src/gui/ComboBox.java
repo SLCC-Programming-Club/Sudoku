@@ -2,6 +2,8 @@ package gui;
 
 import javax.swing.JComboBox;
 
+import gui.backend.Settings;
+
 /**
  * A custom JComboBox with the appropriate styling for the Sudoku app.
  */

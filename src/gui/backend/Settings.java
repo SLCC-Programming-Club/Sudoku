@@ -1,9 +1,10 @@
-package gui;
+package gui.backend;
 
 import java.io.File;
 import java.io.IOException;
 
 import java.awt.GraphicsEnvironment;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
 
@@ -36,6 +37,12 @@ public class Settings {
 
     // The font to be used throughout the application.
     private Font font;
+
+    // The default dimension of the application window.
+    private Dimension dimension;
+
+    // Resizable setting
+    private boolean resizable;
 
     /**
      * Create a new Settings object, initializing the default settings
@@ -138,6 +145,50 @@ public class Settings {
     }
 
     /**
+     * The default dimension of the application window.
+     * 
+     * The user can specify both the starting width and height of the app,
+     * and the app will remember the last used dimensions as well.
+     * 
+     * @return Dimension
+     */
+    public Dimension getDimension() {
+        return dimension;
+    }
+
+    /**
+     * Set the default dimension and write it to the settings file.
+     * 
+     * @param dimension
+     */
+    public void setDimension(Dimension dimension) {
+        this.dimension = dimension;
+        updateSettingsFile();
+    }
+
+    /**
+     * The resizable setting for the application window.
+     * 
+     * By default, the application window is not resizable and is considered
+     * an experimental feature. Dynamic layout is not yet supported.
+     * 
+     * @return boolean
+     */
+     public boolean getResizable() {
+        return resizable;
+     }
+
+     /**
+      * Set the resizable setting and write it to the settings file.
+      *
+      * @param resizable
+      */
+      public void setResizable(boolean resizable) {
+        this.resizable = resizable;
+        updateSettingsFile();
+      }
+
+    /**
      * Open and write the settings to the settings file.
      * 
      * This method is called whenever a setting is updated.
@@ -151,7 +202,13 @@ public class Settings {
      * settings file.
      */
     private void defaultSettings() {
+        // Setup the default directory for .sdku puzzle files.
         defaultDirectory = appDirectory + "puzzles";
+        File dir = new File(defaultDirectory);
+
+        if(!dir.exists() || !dir.isDirectory())
+            dir.mkdirs();
+
         newFileProperties = 0;
 
         // Load the font from the system directory.
@@ -162,6 +219,8 @@ public class Settings {
         else 
             font = new Font("Arial", Font.PLAIN, 12);
 
+        dimension = new Dimension(750, 550);
+        resizable = false;
         updateSettingsFile();
     }
 
