@@ -4,9 +4,9 @@ function Run {
     )
     javac *.java
     java App $flag
-    rm *.class
-    rm gui/*.class
-    rm gui/backend/*.class
+    Remove-Item *.class
+    Remove-Item gui/*.class
+    Remove-Item gui/backend/*.class
 }
 
 if ($args.Length -eq 1) {

@@ -1,5 +1,7 @@
 package gui;
 
+import java.awt.GridLayout;
+
 import javax.swing.JPanel;
 
 import gui.backend.Settings;
@@ -17,15 +19,17 @@ import gui.backend.Settings;
  */
 public class Board extends JPanel {
     private Settings s;
+    private Cell[][] grid;
 
     /**
      * Create a new Board object with the default styling from settings.
      * 
      * @param s
      */
-    public Board(Settings s) {
-        super();
+    public Board(Settings s, Cell[][] grid) {
+        super(new GridLayout(9, 9));
         this.s = s;
+        this.grid = grid;
         style();
     }
 
@@ -34,5 +38,9 @@ public class Board extends JPanel {
      */
     private void style() {
         // TODO: Style the Board Panel.
+    }
+
+    private void createBoard() {
+        // TODO: Create the board with the given grid.
     }
 }

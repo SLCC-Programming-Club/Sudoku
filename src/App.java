@@ -7,7 +7,6 @@ import gui.backend.Settings;
 import gui.backend.SudokuChecker;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 
 /**
  * Runner class for the Sudoku App, managing the GUI and coordinating 
@@ -19,7 +18,6 @@ public class App extends JFrame {
 
     // Data fields
     private Settings s;
-    private SudokuChecker checker;
 
     /**
      * Create a new App object, initializing the GUI and internal logic.
@@ -79,7 +77,7 @@ public class App extends JFrame {
      */
     public static void cli() {
         Nav nav = new Nav(new Settings(), true);
-        SudokuChecker check = new SudokuChecker(nav.getLoadedGrid());
+        new SudokuChecker(nav.getLoadedGrid());
     }
 
     /**
