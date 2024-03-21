@@ -1,7 +1,6 @@
-package src;
-
 import java.util.Scanner;
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import javax.swing.JPanel;
 import javax.swing.JComboBox;
@@ -34,6 +33,7 @@ public class Nav extends JPanel {
      * file I/O behavior is dictated by the values in the Settings object.
      */
     public Nav() {
+        super();
         System.out.println("Welcome to the Sudoku Solver!");
 
         Scanner in = new Scanner(System.in);
@@ -44,7 +44,7 @@ public class Nav extends JPanel {
             String inputFilename = in.nextLine();
         in.close();
 
-        open(inputFilename);
+        openFile(inputFilename);
     }
 
     /**
@@ -54,6 +54,7 @@ public class Nav extends JPanel {
      * @param Settings
      */
     public Nav(Settings s) {
+        super();
         this.s = s;
         System.out.println("Welcome to the Sudoku Solver!");
 
@@ -65,15 +66,15 @@ public class Nav extends JPanel {
             String inputFilename = in.nextLine();
         in.close();
 
-        open(inputFilename);
+        openFile(inputFilename);
     }
 
-    private void new() {
-        int default = s.getNewFileProperties();
+    private void newFile() {
+        int defaultOption = s.getNewFileProperties();
 
         // See Settings.getNewFileProperties for possible values and
         //      the expected behavior of each value.
-        switch(default) {
+        switch(defaultOption) {
             case 0:
             case 1:
             case 2:
@@ -87,7 +88,7 @@ public class Nav extends JPanel {
      *
      * @param String
      */
-    private void open(String filename) {
+    private void openFile(String filename) {
         File f = new File(/*"spring24/sudoku/" + */filename + ".sdku");
         if(f == null || !f.exists() || f.isDirectory() || !f.canRead()) {
             System.out.println(
@@ -99,13 +100,13 @@ public class Nav extends JPanel {
                     f.getAbsolutePath()
                 );
 
-            return null;
+            return;
         }
 
         createGrid(f);
     }
 
-    private void save() {
+    private void saveFile() {
         // TODO: Get the current Cell[][] from the Board JPanel
         // TODO: Write to a file.
     }
@@ -162,12 +163,13 @@ public class Nav extends JPanel {
 
             this.grid = grid;
         } catch (FileNotFoundException e) {
+            String filename = f.getName();
             System.err.println("An error occurred while reading the file " +
                     filename + ".sdku."
                 );
 
             e.printStackTrace();
-            return null;
+            return;
         }
     }
 }

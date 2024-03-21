@@ -1,5 +1,3 @@
-package src;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -40,44 +38,20 @@ import java.util.Scanner;
  *     961537284
  *     287419635
  *     345286179
- * 
- * This challenge is broken up into parts. In Programming Club, we will split into teams of 3-4 people to work on each method.
  */
 public class SudokuChecker {
-
-    public static void main(String[] args) {
-
-            Cell[][] grid = readPuzzle(inputFilename);
-            solve(grid);
-            System.out.println("The solution to the Sudoku puzzle is:");
-            for(int i = 0; i < 9; i++) {
-                for(int j = 0; j < 9; j++) {
-                    System.out.print(grid[i][j].getValue());
-                }
-                System.out.println();
-            }
-            //app.saveSolution(outputFilename, grid);
-    }
-
-    /**
-     * Given an input filename, read the Sudoku puzzle from the file and return it as a 9x9 grid numbers, with no value for spaces in the file.
-     * 
-     * @param filename
-     * @return
-     */
-    public Cell[][] readPuzzle(String filename) {
-    }
+    private Cell[][] grid;
     
-    /**
-     * Given an output filename and a 9x9 grid of numbers, write the Sudoku puzzle to the file.
-     * 
-     * @param grid
-     * @return
-     */
-    public void saveSolution(String filename, Cell[][] grid) {
-        System.out.println("TODO: Write sudoku puzzle solution to " + filename + ".sdku");
-        // TODO: Account for possible invalid solution from isSolved and handle an error.
-        // TODO: Write the solution to the file.
+    public SudokuChecker(Cell[][] grid) {
+        this.grid = grid;
+        solve();
+        System.out.println("The solution to the Sudoku puzzle is:");
+        for(int i = 0; i < 9; i++) {
+            for(int j = 0; j < 9; j++) {
+                System.out.print(grid[i][j].getValue());
+            }
+            System.out.println();
+        }
     }
 
     /**
@@ -102,14 +76,13 @@ public class SudokuChecker {
      * Determine what numbers are available to be placed in the given cell of the grid.
      * This is effectively an intersection of the numbers available in the row, column, and box of the cell.
      * 
-     * @param grid
      * @param row
      * @param col
      * @return an array of numbers that are available to be placed in the given cell
      */
-    private void getAvailableNumbers(Cell[][] grid, int row, int col) {
-        ArrayList<Integer> intersection = intersection(getRowRemainingNumbers(grid, row), getColRemainingNumbers(grid, col));
-        intersection = intersection(intersection, getBoxRemainingNumbers(grid, row, col));
+    private void getAvailableNumbers(int row, int col) {
+        ArrayList<Integer> intersection = intersection(getRowRemainingNumbers(row), getColRemainingNumbers(col));
+        intersection = intersection(intersection, getBoxRemainingNumbers(row, col));
 
         if(intersection.size() == 0) {
             return;
@@ -117,7 +90,7 @@ public class SudokuChecker {
             int value = intersection.get(0);
 
             grid[row][col].setValue(value);
-            updatePossibleValues(grid, row, col);
+            updatePossibleValues(row, col);
             return;
         } else {
             // Join the arrays and find the intersection of the three arrays.
@@ -134,11 +107,10 @@ public class SudokuChecker {
      * Update the possible values for cells in the same row, column, and box as the given cell.
      * This should always be called once a cell's value has been set, to remove that value from the possible values of other cells.
      * 
-     * @param grid
      * @param row
      * @param col
      */
-    private void updatePossibleValues(Cell[][] grid, int row, int col) {
+    private void updatePossibleValues(int row, int col) {
         int value = grid[row][col].getValue();
 
         for(int i = 0; i < 9; i++) {
@@ -146,14 +118,14 @@ public class SudokuChecker {
                 grid[row][i].removePossibleValue(value);
                 if(grid[row][i].getPossibleValues().length == 1) {
                     grid[row][i].setValue(grid[row][i].getPossibleValues()[0]);
-                    updatePossibleValues(grid, row, i);
+                    updatePossibleValues(row, i);
                 }
             }
             if(grid[i][col].getValue() == 0) {
                 grid[i][col].removePossibleValue(value);
                 if(grid[i][col].getPossibleValues().length == 1) {
                     grid[i][col].setValue(grid[i][col].getPossibleValues()[0]);
-                    updatePossibleValues(grid, i, col);
+                    updatePossibleValues(i, col);
                 }
             }
         }
@@ -171,16 +143,14 @@ public class SudokuChecker {
 
     /**
      * Solve the Sudoku puzzle.
-     * 
-     * @param grid
      */
-    public void solve(Cell[][] grid) {
+    public void solve() {
         // Continue until a valid solution is reached.
-        while(!isValidSolution(grid)) {
+        while(!isValidSolution()) {
             for(int i = 0; i < 9; i++) {
                 for(int j = 0; j < 9; j++) {
                     if(grid[i][j].getValue() == 0) {
-                        getAvailableNumbers(grid, i, j);
+                        getAvailableNumbers(i, j);
                     }
                 }
             }
@@ -192,11 +162,10 @@ public class SudokuChecker {
     /**
      * Get any number between 1 and 9 that is not in the row.
      * 
-     * @param grid
      * @param row
      * @return
      */
-    private ArrayList<Integer> getRowRemainingNumbers(Cell[][] grid, int row) {
+    private ArrayList<Integer> getRowRemainingNumbers(int row) {
         ArrayList<Integer> remainingNumbers = new ArrayList<Integer>();
         for(int i = 1; i <= 9; i++) {
             boolean found = false;
@@ -217,11 +186,10 @@ public class SudokuChecker {
     /**
      * Get any number between 1 and 9 that is not in the column.
      * 
-     * @param grid
      * @param col
      * @return
      */
-    private ArrayList<Integer> getColRemainingNumbers(Cell[][] grid, int col) {
+    private ArrayList<Integer> getColRemainingNumbers(int col) {
         ArrayList<Integer> remainingNumbers = new ArrayList<Integer>();
         for(int i = 1; i <= 9; i++) {
             boolean found = false;
@@ -244,11 +212,10 @@ public class SudokuChecker {
      * 
      * A box is a 3x3 subgrid of the 9x9 grid.
      * 
-     * @param grid
      * @param box
      * @return
      */
-    private ArrayList<Integer> getBoxRemainingNumbers(Cell[][] grid, int row, int col) {
+    private ArrayList<Integer> getBoxRemainingNumbers(int row, int col) {
         ArrayList<Integer> remainingNumbers = new ArrayList<Integer>();
         int boxRow = row / 3;
         int boxCol = col / 3;
@@ -291,10 +258,9 @@ public class SudokuChecker {
      * 
      * A valid Sudoku puzzle is one where each row, column, and 3x3 subgrid contains the numbers 1-9 exactly once.
      * 
-     * @param grid a 9x9 grid of numbers
      * @return true if the grid is a valid Sudoku puzzle, and false otherwise
      */
-    private boolean isValidSolution(Cell[][] grid) {
+    private boolean isValidSolution() {
         // Check that every cell has a value between 1 and 9.
         for(int i = 0; i < 9; i++) {
             for(int j = 0; j < 9; j++) {
