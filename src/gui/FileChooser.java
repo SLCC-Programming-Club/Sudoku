@@ -13,22 +13,6 @@ public class FileChooser extends JFileChooser {
     
     /**
      * Create a new FileChooser with the default directory set to the user's
-     * Sudoku directory and no special styling.
-     * 
-     * @param defaultDirectory
-     */
-    public FileChooser(File defaultDirectory) {
-        super(defaultDirectory);
-        for (File f: defaultDirectory.listFiles()) {
-            ensureFileIsVisible(f);
-        }
-
-        style();
-        setupSettings();
-    }
-    
-    /**
-     * Create a new FileChooser with the default directory set to the user's
      * Sudoku directory.
      * 
      * @param defaultDirectory
@@ -70,7 +54,8 @@ public class FileChooser extends JFileChooser {
         public boolean accept(File f) {
             String name = f.getName().toLowerCase();
             if(name.length() > 5) {
-                return name.substring(name.length() - 5).equals(".sdku") || !f.isDirectory();
+                return name.substring(name.length() - 5).equals(".sdku")
+                    || !f.isDirectory();
             }
             return false;
         }

@@ -8,7 +8,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 
 /**
- * Runner class for the Sudoku App, managing the GUI and coordinating internal logic.
+ * Runner class for the Sudoku App, managing the GUI and coordinating 
+ * internal logic.
  */
 public class App extends JFrame {
     // GUI fields
@@ -33,7 +34,8 @@ public class App extends JFrame {
      * Basic JFrame settings and setup for the GUI.
      */
     private void initSetup() {
-        // TODO: These are just some default values, these should use the values from Settings.
+        // TODO: These are just some default values, these should use the 
+        //       values from Settings.
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(750, 550));
@@ -42,9 +44,13 @@ public class App extends JFrame {
         setLocationRelativeTo(null);
 
         try {
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            UIManager.setLookAndFeel(
+                UIManager.getCrossPlatformLookAndFeelClassName()
+            );
         } catch (Exception e) {
-            System.out.println("Error with cross platform look/feel in frameSetup().");
+            System.out.println(
+                "Error with cross platform look/feel in frameSetup()."
+            );
         }
     }
 
@@ -76,7 +82,8 @@ public class App extends JFrame {
     public static void main(String[] args) {
         if(args.length == 0)
             new App().setVisible(true);
-        else if(args[0].equals("-c") || args[0].equals("--cli"))
+        else if(args[0].equals("-c") ||
+                args[0].equals("--cli"))
             cli();
         else
             new App().setVisible(true);

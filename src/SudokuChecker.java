@@ -1,35 +1,40 @@
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Scanner;
-
 
 /**
- * The SudokuChecker class is responsible for checking the validity of a given Sudoku puzzle solution.
+ * The SudokuChecker class is responsible for calculating the solution to
+ * a given Sudoku puzzle.
  * 
- * The SudokuChecker class is also responsible for solving a given Sudoku puzzle.
+ * TODO: The Sudoku algorithm used is efficient and effective for solving
+ * easy and medium puzzles, but it is not optimized for hard puzzles. It
+ * is recommended to use a different algorithm for hard puzzles, likely
+ * a tree & back-track approach.
  */
 public class SudokuChecker {
     private Cell[][] grid;
     
     /**
-     * Create a new SudokuChecker object, initializing the grid to the given 9x9 grid of numbers.
-     * This should either check each cell as the user inputs a value, or be used to check the validity of a
-     * puzzle when the user requests it.
+     * Create a new SudokuChecker object, initializing the grid to the given
+     * 9x9 grid of numbers. This should either check each cell as the user 
+     * inputs a value, or be used to check the validity of a puzzle when the 
+     * user requests it.
      * 
-     * TODO: Currently, this class is not used in the GUI. It is only used in the command-line interface.
+     * TODO: Currently, this class is not used in the GUI. It is only used in
+     * the command-line interface.
+     * 
      * @param grid
      */
     public SudokuChecker(Cell[][] grid) {
         this.grid = grid;
         solve();
-        System.out.println("The solution to the Sudoku puzzle is:");
-        for(int i = 0; i < 9; i++) {
-            for(int j = 0; j < 9; j++) {
-                System.out.print(grid[i][j].getValue());
-            }
-            System.out.println();
-        }
+    }
+
+    /**
+     * Get the solution to the Sudoku puzzle.
+     * 
+     * @return Cell[][]
+     */
+    public Cell[][] getSolution() {
+        return grid;
     }
 
     /**
@@ -39,7 +44,10 @@ public class SudokuChecker {
      * @param b
      * @return
      */
-    private ArrayList<Integer> intersection(ArrayList<Integer> a, ArrayList<Integer> b) {
+    private ArrayList<Integer> intersection(
+        ArrayList<Integer> a, 
+        ArrayList<Integer> b
+    ) {
         ArrayList<Integer> intersection = new ArrayList<Integer>();
         for(int i = 0; i < a.size(); i++) {
             if(b.contains(a.get(i))) {
@@ -51,16 +59,25 @@ public class SudokuChecker {
     }
 
      /**
-     * Determine what numbers are available to be placed in the given cell of the grid.
-     * This is effectively an intersection of the numbers available in the row, column, and box of the cell.
+     * Determine what numbers are available to be placed in the given cell of
+     * the grid. This is effectively an intersection of the numbers available
+     * in the row, column, and box of the cell.
      * 
      * @param row
      * @param col
-     * @return an array of numbers that are available to be placed in the given cell
+     * @return an array of numbers that are available to be placed in the 
+     * given cell
      */
     private void getAvailableNumbers(int row, int col) {
-        ArrayList<Integer> intersection = intersection(getRowRemainingNumbers(row), getColRemainingNumbers(col));
-        intersection = intersection(intersection, getBoxRemainingNumbers(row, col));
+        ArrayList<Integer> intersection = intersection(
+            getRowRemainingNumbers(row),
+            getColRemainingNumbers(col)
+        );
+
+        intersection = intersection(
+            intersection,
+            getBoxRemainingNumbers(row, col)
+        );
 
         if(intersection.size() == 0) {
             return;
@@ -77,13 +94,16 @@ public class SudokuChecker {
                 availableNumbers.add(intersection.get(i));
             }
 
-            grid[row][col].setPossibleValues(arrayListToArray(availableNumbers));
+            grid[row][col].setPossibleValues(
+                arrayListToArray(availableNumbers)
+            );
         }
     }   
 
     /**
-     * Update the possible values for cells in the same row, column, and box as the given cell.
-     * This should always be called once a cell's value has been set, to remove that value from the possible values of other cells.
+     * Update the possible values for cells in the same row, column, and box
+     * as the given cell. This should always be called once a cell's value has
+     * been set, to remove that value from the possible values of other cells.
      * 
      * @param row
      * @param col
@@ -112,9 +132,9 @@ public class SudokuChecker {
         int boxCol = col / 3;
         for(int i = 0; i < 3; i++) {
             for(int j = 0; j < 3; j++) {
-                if(grid[boxRow * 3 + i][boxCol * 3 + j].getValue() == 0) {
-                    grid[boxRow * 3 + i][boxCol * 3 + j].removePossibleValue(value);
-                }
+                if(grid[boxRow * 3 + i][boxCol * 3 + j].getValue() == 0)
+                    grid[boxRow * 3 + i][boxCol * 3 + j].
+                        removePossibleValue(value);
             }
         }
     }
@@ -218,7 +238,8 @@ public class SudokuChecker {
     /**
      * Given a list of numbers, return an array of the numbers.
      * 
-     * A helper method to keep the code using arrays instead of lists whenever possible.
+     * A helper method to keep the code using arrays instead of lists 
+     * whenever possible.
      * 
      * @param list
      * @return
@@ -232,9 +253,11 @@ public class SudokuChecker {
     }
 
     /**
-     * Given a 9x9 grid of numbers, return true if the grid is a valid Sudoku puzzle solution, and false otherwise.
+     * Given a 9x9 grid of numbers, return true if the grid is a valid Sudoku
+     * puzzle solution, and false otherwise.
      * 
-     * A valid Sudoku puzzle is one where each row, column, and 3x3 subgrid contains the numbers 1-9 exactly once.
+     * A valid Sudoku puzzle is one where each row, column, and 3x3 subgrid 
+     * contains the numbers 1-9 exactly once.
      * 
      * @return true if the grid is a valid Sudoku puzzle, and false otherwise
      */
@@ -242,10 +265,8 @@ public class SudokuChecker {
         // Check that every cell has a value between 1 and 9.
         for(int i = 0; i < 9; i++) {
             for(int j = 0; j < 9; j++) {
-                if(grid[i][j].getValue() < 1 || grid[i][j].getValue() > 9) {
-                    //System.out.println("Cell at row " + i + " and column " + j + " has an invalid value of " + grid[i][j].getValue() + ".");
+                if(grid[i][j].getValue() < 1 || grid[i][j].getValue() > 9)
                     return false;
-                }
             }
         }
         
@@ -283,7 +304,10 @@ public class SudokuChecker {
                     }
                 }
                 if(!isValidSet(box)) {
-                    System.out.println("Box at row " + i + " and column " + j + " is invalid.");
+                    System.out.println(
+                        "Box at row " + i +
+                        " and column " + j + " is invalid."
+                    );
                     return false;
                 }
             }
@@ -293,10 +317,12 @@ public class SudokuChecker {
     }
     
     /**
-     * Given an array of 9 numbers, return true if the array contains the numbers 1-9 exactly once, and false otherwise.
+     * Given an array of 9 numbers, return true if the array contains the
+     *  numbers 1-9 exactly once, and false otherwise.
      * 
      * @param set an array of 9 numbers
-     * @return true if the array contains the numbers 1-9 exactly once, and false otherwise
+     * @return true if the array contains the numbers 1-9 exactly once, and 
+     * false otherwise
      */
     private boolean isValidSet(int[] set) {
         boolean[] found = new boolean[9];

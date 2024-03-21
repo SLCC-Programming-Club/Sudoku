@@ -1,6 +1,5 @@
 package gui;
 
-import java.util.Scanner;
 import java.io.File;
 import java.io.IOException;
 
@@ -12,13 +11,30 @@ import java.awt.FontFormatException;
  * A class solely to store user settings relating to default behaviors,
  * difficulty, filepaths, and more.
  *
- * These user settings are stored in a {TBD} file located at {TBD}.
+ * These user settings are stored in a settings file that must be stored
+ * either in "~/.config/sudoku/settings.json" or 
+ * "%APPDATA%/Local/Sudoku/settings.json" depending on the user's operating
+ * system.
+ * 
+ * (Currently) Configurable settings include:
+ *      - Default Directory
+ *      - New File Properties
+ *      - Font
+ * 
  */
 public class Settings {
     private final String os;
 
+    // The directory where the settings file is located.
+    private String appDirectory; 
+
+    // The default directory for .sdku files.
+    private String defaultDirectory; 
+
+    // The properties for creating a new .sdku file.
     private int newFileProperties;
-    private String defaultDirectory;
+
+    // The font to be used throughout the application.
     private Font font;
 
     /**
@@ -33,17 +49,44 @@ public class Settings {
     public Settings() {
         os = System.getProperty("os.name").toLowerCase();
         if(os.startsWith("windows"))
-            defaultDirectory = System.getProperty("user.home") + "\\AppData\\Local\\Sudoku\\";
+            appDirectory = System.getProperty("user.home") + 
+                            "\\AppData\\Local\\Sudoku\\";
         else
-            defaultDirectory = System.getProperty("user.home") + "/.config/sudoku/";
+            appDirectory = System.getProperty("user.home") + 
+                            "/.config/sudoku/";
 
-        File dir = new File(defaultDirectory);
+        File dir = new File(appDirectory);
         if (!dir.exists() || !dir.isDirectory()) {
             dir.mkdirs();
 
             defaultSettings();
         }
         readSettings();
+    }
+
+    /**
+     * The Default Directory is a configurable setting, where the user can
+     * specify a default directory to store .sdku files. This is useful for
+     * eliminating the need for user input for file operations.
+     *
+     * By default, the default directory is either "~/.config/sudoku/puzzles"
+     * or "%APPDATA%/Local/Sudoku/Puzzles", depending on the user's operating
+     * system.
+     * 
+     * @return String
+     */
+    public String getDefaultDirectory() {
+        return defaultDirectory;
+    }
+
+    /**
+     * Set the default directory and write it to the settings file.
+     * 
+     * @param defaultDirectory
+     */
+    public void setDefaultDirectory(String defaultDirectory) {
+        this.defaultDirectory = defaultDirectory;
+        updateSettingsFile();
     }
 
     /**
@@ -66,32 +109,6 @@ public class Settings {
      */
     public void setNewFileProperties(int newFileProperties) {
         this.newFileProperties = newFileProperties;
-        updateSettingsFile();
-    }
-
-    /**
-     * The Default Directory is a configurable setting, where the user can
-     * specify a default directory to store .sdku files. This is useful for
-     * eliminating the need for user input for file operations.
-     *
-     * NOTE: This does not change the location that the settings file may
-     * be located in. At this time, the settings file is always located in
-     * either "~/.config/sudoku/" or "%APPDATA%/Local/Sudoku/", depending
-     * on the user's operating system.
-     * 
-     * @return String
-     */
-    public String getDefaultDirectory() {
-        return defaultDirectory;
-    }
-
-    /**
-     * Set the default directory and write it to the settings file.
-     * 
-     * @param defaultDirectory
-     */
-    public void setDefaultDirectory(String defaultDirectory) {
-        this.defaultDirectory = defaultDirectory;
         updateSettingsFile();
     }
 
@@ -134,6 +151,7 @@ public class Settings {
      * settings file.
      */
     private void defaultSettings() {
+        defaultDirectory = appDirectory + "puzzles";
         newFileProperties = 0;
 
         // Load the font from the system directory.
@@ -154,8 +172,8 @@ public class Settings {
      * to populate the Settings file.
      */
      private void readSettings() {
-        File settingsFile = new File(defaultDirectory + "/settings");
-        if (!settingsFile.exists()) {
+        File settingsFile = new File(appDirectory + "/settings.json");
+        if (!settingsFile.exists() && !settingsFile.isDirectory()) {
             defaultSettings();
             return;
         }
@@ -172,7 +190,9 @@ public class Settings {
         // Load the font from the system directory.
         String fontFilepath;
         if(os.startsWith("windows"))
-            fontFilepath = System.getProperty("user.home") + "\\AppData\\Local\\Microsoft\\Windows\\Fonts\\" + fontName + ".ttf";
+            fontFilepath = System.getProperty("user.home") + 
+                            "\\AppData\\Local\\Microsoft\\Windows\\Fonts\\" +
+                            fontName + ".ttf";
         else if(os.startsWith("mac"))
             fontFilepath = "/Library/Fonts/" + fontName + ".ttf";
         else
@@ -180,12 +200,19 @@ public class Settings {
 
         // Register the font with the GraphicsEnvironment.
         try {
-            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(fontFilepath)));
+            GraphicsEnvironment ge = GraphicsEnvironment.
+                getLocalGraphicsEnvironment();
+
+            ge.registerFont(Font.createFont(
+                Font.TRUETYPE_FONT,
+                new File(fontFilepath)
+            ));
+
             return 0;
 
         } catch(IOException | FontFormatException e) {
-            System.out.println("Filepath of font not found: " + fontFilepath + " does not exist.");
+            System.out.println("Filepath of font not found: " +
+                                fontFilepath + " does not exist.");
             return 1;
         }
     }

@@ -33,7 +33,7 @@ public class Nav extends JPanel {
      * Create a new Nav in a command-line interface. This is intended for
      * debugging rather than practical use.
      *
-     * Additionally, even for debugging, this should be used since default
+     * Additionally, even for debugging, this should not be used since default
      * file I/O behavior is dictated by the values in the Settings object.
      */
     public Nav() {
@@ -61,6 +61,8 @@ public class Nav extends JPanel {
         super();
         this.s = s;
         
+        // If the program is being run in the command-line, prompt the user
+        // for the name of the input file.
         if(cli) {
             System.out.println("Welcome to the Sudoku Solver!");
 
@@ -73,10 +75,10 @@ public class Nav extends JPanel {
             in.close();
 
             openFile(inputFilename);
-        } else {
-            // TODO: Create the GUI for the Nav bar.
-            createGUI();
-        }
+
+        // Otherwise, create the GUI for the Nav bar.
+        } else createGUI();
+            
     }
 
     /**
@@ -92,6 +94,8 @@ public class Nav extends JPanel {
         JButton solve = new JButton("Solve");
             solve.setFont(s.getFont()); // TODO: Make custom Button class.
 
+        // Add the ComboBox for the file options, the elapsed time label, and
+        // the solve button to the Nav Panel.
         add(createFileOptions());
         add(elapsedTime);
         add(solve);
@@ -103,12 +107,14 @@ public class Nav extends JPanel {
      * @return ComboBox<String>
      */
     private ComboBox<String> createFileOptions() {
+        // Create a new ComboBox with the default styling.
         ComboBox<String> fileOptions = new ComboBox<>(s);
             fileOptions.addItem("New");
             fileOptions.addItem("Open");
             fileOptions.addItem("Save");
             fileOptions.addItem("Exit");
 
+        // Add an ActionListener to the ComboBox to handle the user's selection.
         fileOptions.addActionListener(e -> {
             String selected = (String) fileOptions.getSelectedItem();
             switch(selected) {
@@ -154,19 +160,19 @@ public class Nav extends JPanel {
      * Open an existing .sdku file in the user's file system, using a GUI.
      */
     private void openFile() {
+        // No error handling is needed here, since the Settings class ensures
+        // that the default directory is always a valid directory.
         File defaultDirectory = new File(s.getDefaultDirectory());
-        if(defaultDirectory != null || !defaultDirectory.isDirectory()) {
-            defaultDirectory.mkdirs();
-        }
 
-        FileChooser fc = new FileChooser(defaultDirectory);
+        // Custom FileChooser class for style and to ensure the user can only
+        // select .sdku files.
+        FileChooser fc = new FileChooser(defaultDirectory, s);
         int result = fc.showOpenDialog(this);
 
+        // If the user selects a file, open it.
         if(result == FileChooser.APPROVE_OPTION) {
             f = fc.getSelectedFile();
             createGrid(f);
-        } else {
-            System.out.println("No file was selected.");
         }
     }
 
@@ -179,6 +185,7 @@ public class Nav extends JPanel {
      */
     private void openFile(String filename) {
         File f = new File("resources/" + filename + ".sdku");
+        // If the file does not exist, print an error message and return.
         if(f == null || !f.exists() || f.isDirectory() || !f.canRead()) {
             System.out.println(
                     "The file " + filename + 
@@ -192,6 +199,7 @@ public class Nav extends JPanel {
             return;
         }
 
+        // Otherwise, open the file and populate the grid.
         System.out.println("Opening the file " + filename + ".sdku.");
         createGrid(f);
     }
@@ -241,21 +249,31 @@ public class Nav extends JPanel {
      */
     private void createGrid(File f) {
         try (Scanner in = new Scanner(f)) {
+            // Create a new 9x9 grid of Cells.
             Cell[][] grid = new Cell[9][9];
+            
+            // Read in the file line by line.
             for(int i = 0; i < 9; i++) {
+
+                // Read in the line and create a new Cell for each character.
                 String line = in.nextLine();
                 for(int j = 0; j < 9; j++) {
+
+                    // If the character is a period, the cell is empty.
                     if(line.charAt(j) == '.') {
                         grid[i][j] = new Cell(i, j, 0);
                         continue;
                     }
                     
+                    // Otherwise, the character is a digit.
                     int value = Character.getNumericValue(line.charAt(j));
                     grid[i][j] = new Cell(i, j, value);
                 }
             }
 
             this.grid = grid;
+
+        // If the file is not found, print an error message and return.
         } catch (FileNotFoundException e) {
             String filename = f.getName();
             System.err.println("An error occurred while reading the file " +
