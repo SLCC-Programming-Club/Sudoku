@@ -11,6 +11,10 @@ public class Settings {
     private int newFileProperties;
     private String defaultDirectory;
 
+    /**
+     * Create a new Settings object, initializing the default settings
+     * or reading in the settings from a file if it exists.
+     */
     public Settings() {
         // TODO: Read in a file from the master default directory and populate
         // settings, effectively toggles. If the file does not exist,

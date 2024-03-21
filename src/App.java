@@ -9,16 +9,26 @@ import java.awt.Dimension;
  * Runner class for the Sudoku App, managing the GUI and coordinating internal logic.
  */
 public class App extends JFrame {
-    private Settings settings;
+    // GUI fields
+    private Nav nav;
 
+    // Data fields
+    private Settings settings;
+    private SudokuChecker checker;
+
+    /**
+     * Create a new App object, initializing the GUI and internal logic.
+     */
     public App() {
         super("Sudoku");
         settings = new Settings();
+        nav = new Nav(settings, false);
         initSetup();
+        add(createApp());
     }
 
     /**
-     * Basic JFrame setup for the GUI.
+     * Basic JFrame settings and setup for the GUI.
      */
     private void initSetup() {
         // TODO: These are just some default values, these should use the values from Settings.
@@ -36,17 +46,31 @@ public class App extends JFrame {
         }
     }
 
+    /**
+     * Create the root JPanel holding all other GUI components.
+     * 
+     * @return JPanel
+     */
     private JPanel createApp() {
         // TODO: Create the root JPanel holding all other GUI components.
-
-        return null;
+        JPanel root = new JPanel();
+            root.add(nav);
+        return root;
     }
 
+    /**
+     * Run the Sudoku App in a command-line interface for debugging core logic.
+     */
     public static void cli() {
-        Nav nav = new Nav(new Settings());
+        Nav nav = new Nav(new Settings(), true);
         SudokuChecker check = new SudokuChecker(nav.getLoadedGrid());
     }
 
+    /**
+     * Main method for the Sudoku App.
+     * 
+     * @param args
+     */
     public static void main(String[] args) {
         if(args.length == 0)
             new App().setVisible(true);

@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 
 import javax.swing.JPanel;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JButton;
 
 /**
  * The Nav class represents the Navigation bar at the top of the JFrame window.
@@ -53,22 +55,57 @@ public class Nav extends JPanel {
      *
      * @param Settings
      */
-    public Nav(Settings s) {
+    public Nav(Settings s, boolean cli) {
         super();
         this.s = s;
-        System.out.println("Welcome to the Sudoku Solver!");
+        
+        if(cli) {
+            System.out.println("Welcome to the Sudoku Solver!");
 
-        Scanner in = new Scanner(System.in);
-            System.out.print(
-                    "Enter the name of the input file (do not " +
-                    "include the file extension): "
-                    );
-            String inputFilename = in.nextLine();
-        in.close();
+            Scanner in = new Scanner(System.in);
+                System.out.print(
+                        "Enter the name of the input file (do not " +
+                        "include the file extension): "
+                        );
+                String inputFilename = in.nextLine();
+            in.close();
 
-        openFile(inputFilename);
+            openFile(inputFilename);
+        } else {
+            // TODO: Create the GUI for the Nav bar.
+            createGUI();
+        }
     }
 
+    /**
+     * Create the GUI for the Nav bar.
+     * 
+     * This method is called when the Nav object is created in the App
+     * class if the program is not being run in the command-line for
+     * debugging purposes.
+     */
+    private void createGUI() {
+        JComboBox<String> fileOptions = new JComboBox<String>();
+            fileOptions.addItem("New");
+            fileOptions.addItem("Open");
+            fileOptions.addItem("Save");
+            fileOptions.addItem("Exit");
+            
+        JLabel elapsedTime = new JLabel("Elapsed Time: 00:00:00");
+
+        JButton solve = new JButton("Solve");
+
+        add(fileOptions);
+        add(elapsedTime);
+        add(solve);
+    }
+
+    /**
+     * Given the user's selection from the JComboBox, perform the appropriate
+     * action.
+     *
+     * @param String
+     */
     private void newFile() {
         int defaultOption = s.getNewFileProperties();
 
@@ -106,6 +143,10 @@ public class Nav extends JPanel {
         createGrid(f);
     }
 
+    /**
+     * Save the currently open .sdku file with any changes the user has made.
+     * This needs to pull the current state of the grid from the Board JPanel.
+     */
     private void saveFile() {
         // TODO: Get the current Cell[][] from the Board JPanel
         // TODO: Write to a file.

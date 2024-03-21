@@ -5,43 +5,21 @@ import java.util.Scanner;
 
 
 /**
- * A Sudoku puzzle is a 9x9 grid of numbers, where each row, column, and 3x3 subgrid contains the numbers 1-9 exactly once.
+ * The SudokuChecker class is responsible for checking the validity of a given Sudoku puzzle solution.
  * 
- * The goal of this challenge is to write a program that can solve Sudoku puzzles.
- * 
- * Given an input .sdku file (a plain-text file containing the initial state of a Sudoku puzzle), find the solution to the puzzle and write the solution to a new .sdku file.
- * 
- * The input file will contain 9 lines, each containing 9 characters. Each character will be a digit (1-9) or a period (.), representing an empty cell.
- * 
- * The output file should contain the same 9x9 grid, with the empty cells filled in with the correct numbers.
- * 
- * For example, given the following input file:
- * 
- *      53..7....
- *      6..195...
- *      .98....6.
- *      8...6...3
- *      4..8.3..1
- *      7...2...6
- *      .6....28.
- *      ...419..5
- *      ....8..79
- * 
- * The output file should be:
- * 
- *     534678912
- *     672195348
- *     198342567
- *     859761423
- *     426853791
- *     713924856
- *     961537284
- *     287419635
- *     345286179
+ * The SudokuChecker class is also responsible for solving a given Sudoku puzzle.
  */
 public class SudokuChecker {
     private Cell[][] grid;
     
+    /**
+     * Create a new SudokuChecker object, initializing the grid to the given 9x9 grid of numbers.
+     * This should either check each cell as the user inputs a value, or be used to check the validity of a
+     * puzzle when the user requests it.
+     * 
+     * TODO: Currently, this class is not used in the GUI. It is only used in the command-line interface.
+     * @param grid
+     */
     public SudokuChecker(Cell[][] grid) {
         this.grid = grid;
         solve();
