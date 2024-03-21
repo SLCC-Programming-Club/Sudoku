@@ -9,10 +9,11 @@ import javax.swing.JFileChooser;
  * Additionally, this FileChooser only allows .sdku files to be selected.
  */
 public class FileChooser extends JFileChooser {
+    private Settings s;
     
     /**
      * Create a new FileChooser with the default directory set to the user's
-     * Sudoku directory.
+     * Sudoku directory and no special styling.
      * 
      * @param defaultDirectory
      */
@@ -21,6 +22,26 @@ public class FileChooser extends JFileChooser {
         for (File f: defaultDirectory.listFiles()) {
             ensureFileIsVisible(f);
         }
+
+        style();
+        setupSettings();
+    }
+    
+    /**
+     * Create a new FileChooser with the default directory set to the user's
+     * Sudoku directory.
+     * 
+     * @param defaultDirectory
+     * @param s
+     */
+    public FileChooser(File defaultDirectory, Settings s) {
+        super(defaultDirectory);
+        this.s = s;
+
+        for (File f: defaultDirectory.listFiles()) {
+            ensureFileIsVisible(f);
+        }
+
         style();
         setupSettings();
     }
@@ -30,7 +51,7 @@ public class FileChooser extends JFileChooser {
      */
     private void style() {
         // TODO: Style the FileChooser.
-        System.out.println("TODO: Style the FileChooser.");
+        setFont(s.getFont());
     }
 
     /**
@@ -39,7 +60,6 @@ public class FileChooser extends JFileChooser {
     private void setupSettings() {
         setFileHidingEnabled(false);
         setFileSelectionMode(JFileChooser.FILES_ONLY);
-        rescanCurrentDirectory();
         setFileFilter(new Filter());
     }
 

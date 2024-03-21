@@ -8,6 +8,7 @@ import javax.swing.JButton;
 
 import gui.ComboBox;
 import gui.FileChooser;
+import gui.Settings;
 /**
  * The Nav class represents the Navigation bar at the top of the JFrame window.
  *
@@ -87,7 +88,9 @@ public class Nav extends JPanel {
      */
     private void createGUI() {
         JLabel elapsedTime = new JLabel("Elapsed Time: 00:00:00");
+            elapsedTime.setFont(s.getFont()); // TODO: Make custom Label class.
         JButton solve = new JButton("Solve");
+            solve.setFont(s.getFont()); // TODO: Make custom Button class.
 
         add(createFileOptions());
         add(elapsedTime);
@@ -100,7 +103,7 @@ public class Nav extends JPanel {
      * @return ComboBox<String>
      */
     private ComboBox<String> createFileOptions() {
-        ComboBox<String> fileOptions = new ComboBox<>();
+        ComboBox<String> fileOptions = new ComboBox<>(s);
             fileOptions.addItem("New");
             fileOptions.addItem("Open");
             fileOptions.addItem("Save");

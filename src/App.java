@@ -2,6 +2,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
+import gui.Settings;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 
