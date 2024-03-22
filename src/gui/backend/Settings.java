@@ -44,6 +44,12 @@ public class Settings {
     // Resizable setting
     private boolean resizable;
 
+    // Cell GUI Start Mode
+    private boolean cellGUIStartMode;
+
+    // Default open state for the application.
+    private int defaultOpenState;
+
     /**
      * Create a new Settings object, initializing the default settings
      * or reading in the settings from settings file if it exists.
@@ -174,28 +180,78 @@ public class Settings {
      * 
      * @return boolean
      */
-     public boolean getResizable() {
+    public boolean getResizable() {
         return resizable;
-     }
+    }
 
-     /**
-      * Set the resizable setting and write it to the settings file.
-      *
-      * @param resizable
-      */
-      public void setResizable(boolean resizable) {
+    /**
+     * Set the resizable setting and write it to the settings file.
+     *
+     * @param resizable
+     */
+    public void setResizable(boolean resizable) {
         this.resizable = resizable;
         updateSettingsFile();
-      }
+    }
+
+    /**
+     * The Cell GUI Start Mode is a configurable setting, where the user can
+     * specify whether the cell GUI should start in notes mode or value mode.
+     * 
+     * By default, the cell GUI starts in value mode, ie. returns false.
+     * Set to true to start in notes mode.
+     * 
+     * @return boolean
+     */
+    public boolean getCellGUIStartMode() {
+        return cellGUIStartMode;
+    }
+
+    /**
+     * Set the cell GUI start mode and write it to the settings file.
+     * 
+     * @param cellGUIStartMode
+     */
+    public void setCellGUIStartMode(boolean cellGUIStartMode) {
+        this.cellGUIStartMode = cellGUIStartMode;
+        updateSettingsFile();
+    }
+
+    /**
+     * The default open state for the application. The following values
+     * are accepted:
+     *     0 - Open the default easy.sdku file, default behavior;
+     *     1 - Open the last opened .sdku file;
+     *     2 - Open a new, blank .sdku file; and 
+     *     3 - Open a new, random .sdku file.
+     * 
+     * NOTE: The value 2 is not yet supported. 
+     * 
+     * @return
+     */
+    public int getDefaultOpenState() {
+        return defaultOpenState;
+    }
+
+    /**
+     * Set the default open state for the application and write it to the
+     * settings file.
+     * 
+     * @param defaultOpenState
+     */
+    public void setDefaultOpenState(int defaultOpenState) {
+        this.defaultOpenState = defaultOpenState;
+        updateSettingsFile();
+    }
 
     /**
      * Open and write the settings to the settings file.
      * 
      * This method is called whenever a setting is updated.
      */
-     private void updateSettingsFile() {
+    private void updateSettingsFile() {
         // TODO: Write the settings to the settings file.
-     }
+    }
 
     /**
      * Set the default settings for the application and write them to the
@@ -221,6 +277,9 @@ public class Settings {
 
         dimension = new Dimension(750, 550);
         resizable = false;
+        cellGUIStartMode = false;
+        defaultOpenState = 0;
+
         updateSettingsFile();
     }
 

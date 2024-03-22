@@ -27,6 +27,7 @@ import javax.swing.JButton;
 public class Nav extends JPanel {
     private Settings s;
     private File f;
+    private Board b;
     private Cell[][] grid;
 
     /**
@@ -77,8 +78,37 @@ public class Nav extends JPanel {
             openFile(inputFilename);
 
         // Otherwise, create the GUI for the Nav bar.
-        } else createGUI();
+        } else {
+            createGUI();
             
+            // TODO: Need to implement the default file options in Settings.
+            switch(s.getDefaultOpenState()) {
+                case 0:
+                    openFile("input");
+                    break;
+                case 1:
+                    openFile("medium");
+                    break;
+                case 2:
+                    openFile("hard");
+                    break;
+                default:
+                    System.out.println("Invalid default file option.");
+            }
+        }
+    }
+
+    /**
+     * Set the Board object for the Nav bar.
+     * 
+     * This is necessary for the Nav bar to be able to interact with the
+     * Board object and update the grid with file I/O operations. This
+     * shouldn't be necessary to change once the program is running.
+     * 
+     * @param b
+     */
+    public void setBoard(Board b) {
+        this.b = b;
     }
 
     /**
@@ -174,6 +204,7 @@ public class Nav extends JPanel {
             f = fc.getSelectedFile();
             createGrid(f);
         }
+        b.setGrid(grid);
     }
 
     /**
@@ -195,6 +226,11 @@ public class Nav extends JPanel {
             System.out.println("The exact path to the file is: " + 
                     f.getAbsolutePath()
                 );
+
+            grid = new Cell[9][9];
+            for(int i = 0; i < 9; i++)
+                for(int j = 0; j < 9; j++)
+                    grid[i][j] = new Cell(i, j, 0);
 
             return;
         }
@@ -281,6 +317,7 @@ public class Nav extends JPanel {
                 );
 
             e.printStackTrace();
+            grid = new Cell[9][9];
             return;
         }
     }

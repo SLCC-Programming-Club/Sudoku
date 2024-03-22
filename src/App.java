@@ -1,12 +1,11 @@
+// GUI imports
 import javax.swing.JFrame;
 import javax.swing.UIManager;
-
-import gui.Nav;
-import gui.Root;
-import gui.backend.Settings;
-import gui.backend.SudokuChecker;
-
 import java.awt.BorderLayout;
+
+// Project imports
+import gui.*;
+import gui.backend.*;
 
 /**
  * Runner class for the Sudoku App, managing the GUI and coordinating 
@@ -15,6 +14,7 @@ import java.awt.BorderLayout;
 public class App extends JFrame {
     // GUI fields
     private Nav nav;
+    private Board board;
 
     // Data fields
     private Settings s;
@@ -25,8 +25,10 @@ public class App extends JFrame {
     public App() {
         super("Sudoku");
         s = new Settings();
-        nav = new Nav(s, false);
         initSetup();
+        nav = new Nav(s, false);
+        board = new Board(s, nav.getLoadedGrid());
+        nav.setBoard(board);
         add(createApp());
     }
 
@@ -68,6 +70,7 @@ public class App extends JFrame {
     private Root createApp() {
         Root root = new Root(s);
             root.add(nav);
+            root.add(board);
 
         return root;
     }
