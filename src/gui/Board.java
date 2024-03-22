@@ -99,8 +99,7 @@ public class Board extends JPanel {
         private Cell cell;
         private JLabel valueLabel;
         private Note[] notesLabels = new Note[9];
-        private boolean notes; // true for notes, false for value
-        private boolean cellGUIStartMode;
+        private boolean noteMode; // true to display notes, or display value
 
         /**
          * Create a new CellGUI object with the given single cell.
@@ -110,16 +109,16 @@ public class Board extends JPanel {
          * @param cell
          * @param startInNotesOrValueMode
          */
-        public CellGUI(Cell cell, boolean notes, Theme theme) {
+        public CellGUI(Cell cell, boolean noteMode, Theme theme) {
             super();
             this.cell = cell;
-            this.notes = notes;
+            this.noteMode = noteMode;
             this.theme = theme;
             style();
 
             // Populate the cell with the appropriate value or notes.
             if(cell.getValue() == 0) {
-                notes = !notes;
+                noteMode = !noteMode; // Flip for use with setNoteMode()
                 valueLabel = new JLabel("");
                 setNoteMode();
             } else {
@@ -186,10 +185,12 @@ public class Board extends JPanel {
         /**
          * Toggle the mode of the cell between value and note, including the
          * layout of the cell.
+         * 
+         * If the current mode is value, switch to note mode, and vice versa.
          */
         public void setNoteMode() {
             removeAll();
-            if(notes) {
+            if(noteMode) {
                 setLayout(valueLayout);
 
                 add(valueLabel);
@@ -199,11 +200,13 @@ public class Board extends JPanel {
                 generateNotes();
                 for(int i = 0; i < 9; i++)
                     add(notesLabels[i]);
+
+                System.out.println("Displaying notes.");
             }
             
             repaint();
             revalidate();
-            notes = !notes;
+            noteMode = !noteMode;
         }
 
         /**
