@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import javax.swing.JPanel;
 
 import gui.backend.Settings;
+import gui.backend.SudokuChecker;
 
 import javax.swing.JLabel;
 import javax.swing.JButton;
@@ -26,6 +27,7 @@ import javax.swing.JButton;
  */
 public class Nav extends JPanel {
     private Settings s;
+    private SudokuChecker sc;
     private File f;
     private Board b;
     private Cell[][] grid;
@@ -112,6 +114,22 @@ public class Nav extends JPanel {
     }
 
     /**
+     * Set the SudokuChecker object for the Nav bar.
+     * 
+     * This is necessary for the Nav bar to be able to interact with the
+     * SudokuChecker object for the solve button. This shouldn't be necessary
+     * to change once the program is running.
+     */
+    public void setChecker(SudokuChecker sc) {
+        this.sc = sc;
+    }
+
+    private void style() {
+        setBackground(s.getTheme().getPrimaryBackground());
+        setForeground(s.getTheme().getPrimaryText());
+    }
+
+    /**
      * Create the GUI for the Nav bar.
      * 
      * This method is called when the Nav object is created in the App
@@ -119,6 +137,7 @@ public class Nav extends JPanel {
      * debugging purposes.
      */
     private void createGUI() {
+        style();
         JLabel elapsedTime = new JLabel("Elapsed Time: 00:00:00");
             elapsedTime.setFont(s.getFont()); // TODO: Make custom Label class.
         JButton solve = new JButton("Solve");

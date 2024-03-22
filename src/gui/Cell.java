@@ -11,6 +11,8 @@ public class Cell {
     private int col;
     private int box;
     private int value;
+    private boolean initValue;
+
     private List possibleValues;
     
     /**
@@ -41,6 +43,8 @@ public class Cell {
         this.row = row;
         this.col = col;
         this.value = value;
+        initValue = value != 0;
+
         setBox();
         possibleValues = new List();
     }
@@ -69,6 +73,8 @@ public class Cell {
      * @param value
      */
     public void setValue(int value) {
+        if(initValue) return;
+
         possibleValues.clear();
         this.value = value;
     }
@@ -99,6 +105,8 @@ public class Cell {
      * @param value
      */
     public void addPossibleValue(int value) {
+        if(initValue) return;
+
         if(possibleValues.contains(value)) {
             return;
         } else if(value < 1 || value > 9) {
@@ -114,6 +122,8 @@ public class Cell {
      * @param possibleValues
      */
     public void setPossibleValues(int[] possibleValues) {
+        if(initValue) return;
+
         this.possibleValues = new List(possibleValues);
     }
 
@@ -140,7 +150,7 @@ public class Cell {
     public int[] getPossibleValues() {
         return possibleValues.toArray();
     }
-    
+
     /**
      * Given the cell's row and column, set the box number for the cell.
      */

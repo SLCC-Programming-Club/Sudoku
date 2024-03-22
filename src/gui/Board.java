@@ -4,9 +4,12 @@ import java.awt.GridLayout;
 import java.awt.LayoutManager;
 
 import javax.swing.JPanel;
+import javax.swing.border.LineBorder;
 import javax.swing.JLabel;
 
 import gui.backend.Settings;
+import gui.backend.SudokuChecker;
+import gui.backend.Theme;
 
 /**
  * The Board class represents the Sudoku board in the GUI.
@@ -22,6 +25,7 @@ import gui.backend.Settings;
 public class Board extends JPanel {
     private Settings s;
     private Cell[][] grid;
+    private SudokuChecker sc;
     private Cell selected;
 
     /**
@@ -29,10 +33,11 @@ public class Board extends JPanel {
      * 
      * @param s
      */
-    public Board(Settings s, Cell[][] grid) {
+    public Board(Settings s, Cell[][] grid, SudokuChecker sc) {
         super(new GridLayout(9, 9));
         this.s = s;
         this.grid = grid;
+        this.sc = sc;
         style();
         createBoard();
     }
@@ -65,13 +70,19 @@ public class Board extends JPanel {
      * Set up the Board Panel with the appropriate styling.
      */
     private void style() {
-        // TODO: Style the Board Panel.
+        setBackground(s.getTheme().getPrimaryBackground());
+        setForeground(s.getTheme().getPrimaryText());
     }
 
+    /**
+     * Create the Board Panel with the appropriate cells.
+     */
     private void createBoard() {
+        if(s.getAutoFillNotes()) grid = sc.getPossibleValues(grid);
+
         for(int i = 0; i < 9; i++) {
             for(int j = 0; j < 9; j++) {
-                CellGUI cell = new CellGUI(grid[i][j], s.getCellGUIStartMode());
+                CellGUI cell = new CellGUI(grid[i][j], s.getCellGUIStartMode() || s.getAutoFillNotes(), s.getTheme());
                 add(cell);
             }
         }
@@ -81,14 +92,15 @@ public class Board extends JPanel {
      * GUI representation of a single cell in the Sudoku grid.
      */
     private class CellGUI extends JPanel {
-        private static GridLayout noteLayout = new GridLayout(3, 3);
-        private static GridLayout valueLayout = new GridLayout(1, 1);
+        private GridLayout noteLayout = new GridLayout(3, 3);
+        private GridLayout valueLayout = new GridLayout(1, 1);
+        private Theme theme;
 
         private Cell cell;
         private JLabel valueLabel;
-        private JLabel[] notesLabels;
+        private Note[] notesLabels = new Note[9];
         private boolean notes; // true for notes, false for value
-        private boolean startInNotesOrValueMode;
+        private boolean cellGUIStartMode;
 
         /**
          * Create a new CellGUI object with the given single cell.
@@ -98,24 +110,18 @@ public class Board extends JPanel {
          * @param cell
          * @param startInNotesOrValueMode
          */
-        public CellGUI(Cell cell, boolean startInNotesOrValueMode) {
+        public CellGUI(Cell cell, boolean notes, Theme theme) {
             super();
             this.cell = cell;
-            this.startInNotesOrValueMode = startInNotesOrValueMode;
+            this.notes = notes;
+            this.theme = theme;
+            style();
 
             // Populate the cell with the appropriate value or notes.
             if(cell.getValue() == 0) {
-                generateNotes();
-                
-                if(startInNotesOrValueMode) {
-                    setLayout(noteLayout);
-                    notes = true;
-                } else {
-                    setLayout(valueLayout);
-                    notes = false;
-                    valueLabel = new JLabel("");
-                    add(valueLabel);
-                }
+                notes = !notes;
+                valueLabel = new JLabel("");
+                setNoteMode();
             } else {
                 valueLabel = new JLabel(Integer.toString(cell.getValue()));
                 add(valueLabel);
@@ -129,6 +135,25 @@ public class Board extends JPanel {
          */
         public int getValue() {
             return cell.getValue();
+        }
+
+        /**
+         * Set the value of the underlying Cell object.
+         * 
+         * @param value
+         */
+        public void setValue(int value) {
+            cell.setValue(value);
+            valueLabel.setText(Integer.toString(value));
+        }
+
+        /**
+         * Set the possible values of the underlying Cell object.
+         * 
+         * @param value
+         */
+        public void setPossibleValues(int[] values) {
+            cell.setPossibleValues(values);
         }
 
         /**
@@ -163,23 +188,31 @@ public class Board extends JPanel {
          * layout of the cell.
          */
         public void setNoteMode() {
+            removeAll();
             if(notes) {
-                removeAll();
                 setLayout(valueLayout);
-                repaint();
-                revalidate();
 
                 add(valueLabel);
             } else {
-                removeAll();
                 setLayout(noteLayout);
-                repaint();
-                revalidate();
 
                 generateNotes();
+                for(int i = 0; i < 9; i++)
+                    add(notesLabels[i]);
             }
             
+            repaint();
+            revalidate();
             notes = !notes;
+        }
+
+        /**
+         * Style the cell with the appropriate colors from the theme.
+         */
+        private void style() {
+            setBackground(theme.getPrimaryBackground());
+            setForeground(theme.getPrimaryText());
+            setBorder(new LineBorder(theme.getPrimaryBorder(), 2));
         }
 
         /**
@@ -187,20 +220,22 @@ public class Board extends JPanel {
          */
         private void generateNotes() {
             if(cell.getPossibleValues().length == 0) {
-                notesLabels = new JLabel[9];
+                for(int i = 0; i < 9; i++) {
+                    notesLabels[i] = new Note("", theme);
+                    add(notesLabels[i]);
+                }
                 return;
             }
 
+
             // Add the noted possible values to the cell.
-            int index = 0;
             for(int i = 1; i <= 9; i++) {
-                if(cell.getPossibleValues()[index] == i) {
-                    notesLabels[index] = new JLabel(Integer.toString(i));
-                    index++;
-                } else {
-                    notesLabels[index] = new JLabel("");
-                }
-                add(notesLabels[index]);
+                if(cell.getPossibleValues()[i - 1] == i)
+                    notesLabels[i - 1] = new Note(Integer.toString(i), theme);
+                else
+                    notesLabels[i - 1] = new Note("", theme);
+
+                add(notesLabels[i - 1]);
             }
         }
     }

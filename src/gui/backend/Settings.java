@@ -50,6 +50,12 @@ public class Settings {
     // Default open state for the application.
     private int defaultOpenState;
 
+    // Theme object storing the colors for the GUI components.
+    private Theme theme;
+
+    // Auto-fill notes
+    private boolean autoFillNotes;
+
     /**
      * Create a new Settings object, initializing the default settings
      * or reading in the settings from settings file if it exists.
@@ -245,6 +251,65 @@ public class Settings {
     }
 
     /**
+     * The Theme object stores the colors for the GUI components.
+     * 
+     * The available colors for customization are:
+     *      - primaryBackground
+     *      - secondaryBackground
+     *      - primaryText
+     *      - secondaryText
+     *      - primaryHighlight
+     *      - secondaryHighlight
+     *      - primaryBorder
+     *      - secondaryBorder
+     *      - primaryButton
+     *      - secondaryButton
+     *      - primaryButtonHighlight
+     *      - secondaryButtonHighlight
+     *      - primaryButtonBorder
+     *      - secondaryButtonBorder
+     *
+     * @see Theme
+     * @return
+     */
+    public Theme getTheme() {
+        return theme;
+    }
+
+    /**
+     * Set the theme and write it to the settings file.
+     * 
+     * @param theme
+     */
+    public void setTheme(Theme theme) {
+        this.theme = theme;
+        updateSettingsFile();
+    }
+
+    /**
+     * The Auto-fill notes setting is a configurable setting, where the user
+     * can specify whether notes should be automatically filled in when a
+     * value is placed in a cell.
+     * 
+     * By default, the auto-fill notes setting is set to false.
+     * 
+     * @return boolean
+     */
+    public boolean getAutoFillNotes() {
+        return autoFillNotes;
+    }
+
+    /**
+     * Set the auto-fill notes setting and write it to the settings file.
+     * 
+     * @param autoFillNotes
+     */
+    public void setAutoFillNotes(boolean autoFillNotes) {
+        this.autoFillNotes = autoFillNotes;
+        updateSettingsFile();
+    }
+
+    /**
      * Open and write the settings to the settings file.
      * 
      * This method is called whenever a setting is updated.
@@ -279,6 +344,8 @@ public class Settings {
         resizable = false;
         cellGUIStartMode = false;
         defaultOpenState = 0;
+        theme = new Theme(new File(appDirectory + "default.theme"));
+        autoFillNotes = true;
 
         updateSettingsFile();
     }

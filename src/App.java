@@ -1,4 +1,5 @@
 // GUI imports
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import java.awt.BorderLayout;
@@ -18,6 +19,7 @@ public class App extends JFrame {
 
     // Data fields
     private Settings s;
+    private SudokuChecker sc;
 
     /**
      * Create a new App object, initializing the GUI and internal logic.
@@ -27,8 +29,12 @@ public class App extends JFrame {
         s = new Settings();
         initSetup();
         nav = new Nav(s, false);
-        board = new Board(s, nav.getLoadedGrid());
+        sc = new SudokuChecker(nav.getLoadedGrid());
+        board = new Board(s, nav.getLoadedGrid(), sc);
+
         nav.setBoard(board);
+        nav.setChecker(sc);
+
         add(createApp());
     }
 
@@ -69,6 +75,7 @@ public class App extends JFrame {
      */
     private Root createApp() {
         Root root = new Root(s);
+            root.setLayout(new BoxLayout(root, BoxLayout.Y_AXIS));
             root.add(nav);
             root.add(board);
 

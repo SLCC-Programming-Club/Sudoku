@@ -71,10 +71,11 @@ public class Theme {
      * Sets the theme for the GUI components.
      */
     private void setTheme() {
-        primaryBackground = Color.WHITE;
+        primaryBackground = Color.LIGHT_GRAY;
         secondaryBackground = Color.LIGHT_GRAY;
-        primaryText = Color.BLACK;
+        primaryText = Color.DARK_GRAY;
         secondaryText = Color.DARK_GRAY;
+        primaryBorder = Color.BLACK;
     }
 
     /**

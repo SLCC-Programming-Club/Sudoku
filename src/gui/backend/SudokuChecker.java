@@ -28,7 +28,44 @@ public class SudokuChecker {
      */
     public SudokuChecker(Cell[][] grid) {
         this.grid = grid;
-        solve();
+    }
+
+    /**
+     * Get the possible values for each cell in the Sudoku puzzle.
+     * 
+     * Intended to be used for auto-filling in possible values in the GUI.
+     * 
+     * @return
+     */
+    public Cell[][] getPossibleValues(Cell[][] grid) {
+        for(int row = 0; row < grid.length; row++) {
+            for(int col = 0; col < grid[row].length; col++) {
+                if(grid[row][col].getValue() == 0)
+                    continue;
+
+                ArrayList<Integer> intersection = intersection(
+                    getRowRemainingNumbers(row),
+                    getColRemainingNumbers(col)
+                );
+
+                intersection = intersection(
+                    intersection,
+                    getBoxRemainingNumbers(row, col)
+                );
+
+                // Join the arrays and find the intersection of the three arrays
+                ArrayList<Integer> availableNumbers = new ArrayList<Integer>();
+                for(int i = 0; i < intersection.size(); i++) {
+                    availableNumbers.add(intersection.get(i));
+                }
+
+                grid[row][col].setPossibleValues(
+                    arrayListToArray(availableNumbers)
+                );
+            }
+        }
+
+        return grid;
     }
 
     /**
@@ -37,6 +74,7 @@ public class SudokuChecker {
      * @return Cell[][]
      */
     public Cell[][] getSolution() {
+        solve();
         return grid;
     }
 
