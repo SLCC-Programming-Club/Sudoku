@@ -1,4 +1,4 @@
-package gui;
+package gui.backend;
 /**
  * A Cell represents a single cell in the Sudoku grid.
  * This helper class is used to store the row, column, value, and possible values for a cell.

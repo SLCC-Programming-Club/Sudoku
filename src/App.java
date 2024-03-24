@@ -3,6 +3,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import java.awt.BorderLayout;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 // Project imports
 import gui.*;

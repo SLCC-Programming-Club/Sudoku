@@ -1,10 +1,13 @@
 package gui;
 import java.util.Scanner;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 
 import javax.swing.JPanel;
 
+import gui.backend.Cell;
 import gui.backend.Settings;
 import gui.backend.SudokuChecker;
 
@@ -163,25 +166,41 @@ public class Nav extends JPanel {
             fileOptions.addItem("Save");
             fileOptions.addItem("Exit");
 
-        // Add an ActionListener to the ComboBox to handle the user's selection.
-        fileOptions.addActionListener(e -> {
-            String selected = (String) fileOptions.getSelectedItem();
-            switch(selected) {
-                case "New":
-                    newFile();
-                    break;
-                case "Open":
-                    openFile();
-                    break;
-                case "Save":
-                    saveFile();
-                    break;
-                case "Exit":
-                    System.exit(0);
-                    break;
-                default:
-                    System.out.println("Invalid selection.");
+        fileOptions.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int selected = fileOptions.getSelectedIndex();
+                switch(selected) {
+                    case 0:
+                        newFile();
+                        break;
+                    case 1:
+                        openFile();
+                        break;
+                    case 2:
+                        saveFile();
+                        break;
+                    case 3:
+                        System.exit(0);
+                        break;
+                    default:
+                        System.out.println("Invalid selection.");
+                }
             }
+
+            @Override
+            public void mousePressed(MouseEvent e) {}
+
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                fileOptions.showPopup();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {}
         });
 
         return fileOptions;

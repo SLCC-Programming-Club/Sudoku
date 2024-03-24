@@ -1,8 +1,6 @@
 package gui.backend;
 import java.util.ArrayList;
 
-import gui.Cell;
-
 /**
  * The SudokuChecker class is responsible for calculating the solution to
  * a given Sudoku puzzle.
