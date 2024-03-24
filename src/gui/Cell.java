@@ -89,6 +89,24 @@ public class Cell {
     }
 
     /**
+     * Get the row of the cell.
+     * 
+     * @return row number
+     */
+    public int getRow() {
+        return row;
+    }
+
+    /**
+     * Get the column of the cell.
+     * 
+     * @return column number
+     */
+    public int getCol() {
+        return col;
+    }
+
+    /**
      * Get the box a cell is in.
      * 
      * @return box number
@@ -143,12 +161,24 @@ public class Cell {
     /**
      * Get a list of possible values for the cell.
      * 
-     * This list is a copy of the cell's possible values, and is sorted in ascending order.
+     * This list is a copy of the cell's possible values, and is sorted 
+     * in ascending order.
      * 
      * @return list of possible values for the cell
      */
     public int[] getPossibleValues() {
         return possibleValues.toArray();
+    }
+
+    /**
+     * Check if the cell has an initial value.
+     * 
+     * An initial value is a value that is set when the cell is created,
+     * and cannot be changed.
+     * @return
+     */
+    public boolean isInitValue() {
+        return initValue;
     }
 
     /**
@@ -161,10 +191,12 @@ public class Cell {
     }
     
     /**
-     * This class is used to store the possible values for a cell in a sorted list.
-     * The list is sorted in ascending order, and the values are stored in a linked list.
+     * This class is used to store the possible values for a cell in a 
+     * sorted list. The list is sorted in ascending order, and the values are 
+     * stored in a linked list.
      * 
-     * The List class also contains a method to add a value to the list, and a method to get the list of values as an array.
+     * The List class also contains a method to add a value to the list, 
+     * and a method to get the list of values as an array.
      */
     private class List {
 

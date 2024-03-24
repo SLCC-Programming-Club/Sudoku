@@ -8,6 +8,7 @@ import java.awt.event.MouseListener;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
+import javax.swing.Box;
 import javax.swing.JLabel;
 
 import gui.backend.Settings;
@@ -28,8 +29,10 @@ import gui.backend.Theme;
 public class Board extends JPanel {
     private Settings s;
     private Cell[][] grid;
+    private CellGUI[][] gridGUI;
+    private Box[][] boxGUI = new Box[3][3];
     private SudokuChecker sc;
-    private Cell selected;
+    private CellGUI selected;
 
     /**
      * Create a new Board object with the default styling from settings.
@@ -82,14 +85,72 @@ public class Board extends JPanel {
      */
     private void createBoard() {
         if(s.getAutoFillNotes()) grid = sc.getPossibleValues(grid);
+        gridGUI = new CellGUI[9][9];
 
         for(int i = 0; i < 9; i++) {
             for(int j = 0; j < 9; j++) {
-                CellGUI cell = new CellGUI(grid[i][j], s.getCellGUIStartMode() || s.getAutoFillNotes(), s.getTheme());
+                CellGUI cell = new CellGUI(
+                    grid[i][j],
+                    s.getCellGUIStartMode(),
+                    s.getTheme()
+                );
                 cell.addMouseListener(new MouseListener() {
                     @Override
                     public void mouseClicked(java.awt.event.MouseEvent e) {
-                        cell.setNoteMode();
+                        // If a cell is already selected, deselect it and
+                        // the row and column.
+                        if(selected != null) {
+                            int boxRow = selected.cell.getRow() / 3;
+                            int boxCol = selected.cell.getCol() / 3;
+
+                            for(int n = 0; n < 9; n++) {
+                                int row = selected.cell.getRow();
+                                int col = selected.cell.getCol();
+
+                                if(
+                                    (row == selected.cell.getRow() && n == selected.cell.getCol()) ||
+                                    (col == selected.cell.getCol() && n == selected.cell.getRow())
+                                ) continue;
+
+                                gridGUI[n][col].select();
+                                gridGUI[row][n].select();
+                            }
+
+                            for(int n = 0; n < 3; n++) {
+                                for(int m = 0; m < 3; m++) {
+                                    int row = boxRow * 3 + n;
+                                    int col = boxCol * 3 + m;
+                                    if(row == selected.cell.getRow() || col == selected.cell.getCol()) continue;
+
+                                    gridGUI[row][col].select();
+                                }
+                            }
+                        }
+
+                        // Graphically highlight the row and column
+                        // of the selected cell.
+                        for(int n = 0; n < 9; n++) {
+                            gridGUI[n][cell.cell.getCol()].select();
+                            gridGUI[cell.cell.getRow()][n].select();
+                        }
+
+                        selected = cell;
+                        int boxRow = selected.cell.getRow() / 3;
+                        int boxCol = selected.cell.getCol() / 3;
+                        for(int n = 0; n < 3; n++) {
+                            for(int m = 0; m < 3; m++) {
+                                int row = boxRow * 3 + n;
+                                int col = boxCol * 3 + m;
+                                if(row == selected.cell.getRow() || col == selected.cell.getCol()) continue;
+
+                                if(
+                                    (row == selected.cell.getRow() && n == selected.cell.getCol()) ||
+                                    (col == selected.cell.getCol() && n == selected.cell.getRow())
+                                ) continue;
+
+                                gridGUI[row][col].select();
+                            }
+                        }
                     }
                     @Override
                     public void mousePressed(java.awt.event.MouseEvent e) {}
@@ -101,7 +162,8 @@ public class Board extends JPanel {
                     public void mouseExited(java.awt.event.MouseEvent e) {}
                 
                 });
-                add(cell);
+                gridGUI[i][j] = cell;
+                add(gridGUI[i][j]);
             }
         }
     }
@@ -121,6 +183,7 @@ public class Board extends JPanel {
         // Data fields
         private Cell cell;
         private boolean noteMode; // true to display notes, or display value
+        private boolean selected = false; // true if the cell is selected
 
         /**
          * Create a new CellGUI object with the given single cell.
@@ -135,19 +198,25 @@ public class Board extends JPanel {
             this.cell = cell;
             this.noteMode = !noteMode; // Flip for use with setNoteMode()
             this.theme = theme;
+            selected = false;
             setLayout(valueLayout);
             style();
 
             // Populate the cell with the appropriate value or notes.
             if(cell.getValue() == 0) {
                 valueLabel = new JLabel("");
+                valueLabel.setForeground(theme.getPrimaryText());
+                internalPanel.setLayout(noteLayout);
+                generateNotes();
             } else {
                 valueLabel = new JLabel(
                     Integer.toString(cell.getValue()),
                     SwingConstants.CENTER
                 );
+                valueLabel.setForeground(theme.getPrimaryText());
+                internalPanel.setLayout(valueLayout);
+                internalPanel.add(valueLabel);
             }
-            setNoteMode();
             add(internalPanel);
         }
 
@@ -214,6 +283,8 @@ public class Board extends JPanel {
          * If the current mode is value, switch to note mode, and vice versa.
          */
         public void setNoteMode() {
+            if(cell.isInitValue()) return;
+
             internalPanel.removeAll();
             if(noteMode) {
                 internalPanel.setLayout(valueLayout);
@@ -231,12 +302,37 @@ public class Board extends JPanel {
             noteMode = !noteMode;
         }
 
+        public void select() {
+            selected = !selected;
+            
+            if(!selected) {
+                setBackground(theme.getPrimaryBackground());
+                setForeground(theme.getPrimaryText());
+                internalPanel.setBackground(theme.getPrimaryBackground());
+                internalPanel.setForeground(theme.getPrimaryText());
+                valueLabel.setForeground(theme.getPrimaryText());
+                setBorder(new LineBorder(theme.getPrimaryBorder(), 2));
+            } else {
+                setBackground(theme.getSecondaryBackground());
+                setForeground(theme.getSecondaryText());
+                internalPanel.setBackground(theme.getSecondaryBackground());
+                internalPanel.setForeground(theme.getSecondaryText());
+                valueLabel.setForeground(theme.getPrimaryText());
+                setBorder(new LineBorder(theme.getSecondaryBorder(), 2));
+            }
+            
+            repaint();
+            revalidate();
+        }
+
         /**
          * Style the cell with the appropriate colors from the theme.
          */
         private void style() {
             setBackground(theme.getPrimaryBackground());
             setForeground(theme.getPrimaryText());
+            internalPanel.setBackground(theme.getPrimaryBackground());
+            internalPanel.setForeground(theme.getPrimaryText());
             setBorder(new LineBorder(theme.getPrimaryBorder(), 2));
         }
 

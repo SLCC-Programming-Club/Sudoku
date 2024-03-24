@@ -343,7 +343,7 @@ public class Settings {
 
         dimension = new Dimension(1000, 1000);
         resizable = false;
-        cellGUIStartMode = true;
+        cellGUIStartMode = false;
         defaultOpenState = 0;
         theme = new Theme(new File(appDirectory + "default.theme"));
         autoFillNotes = true;
