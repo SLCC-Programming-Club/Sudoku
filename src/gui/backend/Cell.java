@@ -126,6 +126,7 @@ public class Cell {
         if(initValue) return;
 
         if(possibleValues.contains(value)) {
+            removePossibleValue(value);
             return;
         } else if(value < 1 || value > 9) {
             return;
@@ -179,6 +180,17 @@ public class Cell {
      */
     public boolean isInitValue() {
         return initValue;
+    }
+
+    public static Cell[][] copyGrid(Cell[][] grid) {
+        Cell[][] newGrid = new Cell[9][9];
+        for(int row = 0; row < 9; row++) {
+            for(int col = 0; col < 9; col++) {
+                newGrid[row][col] = new Cell(row, col, grid[row][col].getValue());
+            }
+        }
+
+        return newGrid;
     }
 
     /**

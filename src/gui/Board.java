@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.event.KeyAdapter;
@@ -29,6 +30,7 @@ import gui.backend.SudokuChecker;
 public class Board extends JPanel {
     private Settings s;
     private Cell[][] grid;
+    private Cell[][] solvedGrid;
     private CellGUI[][] gridGUI;
     private SudokuChecker sc;
     private CellGUI selected;
@@ -43,6 +45,8 @@ public class Board extends JPanel {
         this.s = s;
         this.grid = grid;
         this.sc = sc;
+        solvedGrid = new SudokuChecker(Cell.copyGrid(grid)).getSolution();
+
         style();
         createBoard();
     }
@@ -50,30 +54,42 @@ public class Board extends JPanel {
     private KeyListener createKeyListener() {
         return new KeyListener() {
             @Override
-            public void keyTyped(KeyEvent e) {
-                char key = e.getKeyChar();
-                if(!Character.isDigit(key)) return;
-                if(selected.cell.isInitValue()) return;
-
-                if(e.getKeyCode() == e.VK_BACK_SPACE) {
-                    if(selected.isInNotesMode()) {
-                        System.out.println("Remove all notes.");
-                        return;
-                    } else {
-                        selected.setValue(0);
-                        return;
-                    }
-                }
-
-                if(!selected.isInNotesMode())
-                    selected.setValue(Character.getNumericValue(key));
-            }
+            public void keyTyped(KeyEvent e) {}
 
             @Override
             public void keyPressed(KeyEvent e) {}
 
             @Override
-            public void keyReleased(KeyEvent e) {}
+            public void keyReleased(KeyEvent e) {
+                char key = e.getKeyChar();
+                if(selected.cell.isInitValue()) return;
+                
+                // Backspace key code is 0
+                if(e.getKeyCode() == e.VK_BACK_SPACE) {
+                    selected.removeValue();
+                    selected.repaint();
+                    selected.revalidate();
+                    return;
+                }
+
+                if(!Character.isDigit(key)) return;
+
+                if(!selected.isInNotesMode()) {
+                    if(s.getAutoCheckValues()) {
+                        int row = selected.cell.getRow();
+                        int col = selected.cell.getCol();
+                        int expected = solvedGrid[row][col].getValue();
+                        selected.setValue(Character.getNumericValue(key), expected);
+                    } else {
+                        selected.setValue(Character.getNumericValue(key));
+                    }
+                } else {
+                    selected.addPossibleValue(Character.getNumericValue(key));
+                }
+
+                selected.repaint();
+                selected.revalidate();
+            }
         };
     }
 
@@ -171,7 +187,8 @@ public class Board extends JPanel {
                 CellGUI cell = new CellGUI(
                     grid[i][j],
                     s.getCellGUIStartMode(),
-                    s.getTheme()
+                    s.getTheme(),
+                    s.getCellDimensions()
                 );
                 cell.addMouseListener(new MouseListener() {
                     @Override

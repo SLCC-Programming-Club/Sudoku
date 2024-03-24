@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 
 import javax.swing.JLabel;
@@ -19,9 +20,11 @@ class CellGUI extends JPanel {
     private JPanel internalPanel = new JPanel(new BorderLayout());
         private GridLayout noteLayout = new GridLayout(3, 3);
         private GridLayout valueLayout = new GridLayout(0, 1);
+        private Dimension size;
     private JLabel valueLabel;
     private Note[] notesLabels = new Note[9];
     private Theme theme;
+    private boolean incorrect;
 
     // Data fields
     Cell cell;
@@ -36,7 +39,7 @@ class CellGUI extends JPanel {
      * @param cell
      * @param startInNotesOrValueMode
      */
-    public CellGUI(Cell cell, boolean noteMode, Theme theme) {
+    public CellGUI(Cell cell, boolean noteMode, Theme theme, Dimension size) {
         super();
         this.cell = cell;
         this.noteMode = !noteMode; // Flip for use with setNoteMode()
@@ -45,7 +48,9 @@ class CellGUI extends JPanel {
         setFocusable(true);
         setLayout(valueLayout);
         valueLabel = new JLabel("", SwingConstants.CENTER);
-        style();
+        this.size = size;
+        setSize(this.size);
+        defaultStyle();
 
         // Populate the cell with the appropriate value or notes.
         if(cell.getValue() == 0) {
@@ -57,6 +62,25 @@ class CellGUI extends JPanel {
             internalPanel.add(valueLabel);
         }
         add(internalPanel);
+    }
+
+    /**
+     * Get the size of the cell.
+     */
+    public Dimension getSize() {
+        return size;
+    }
+
+    /**
+     * Set the size of the cell.
+     */
+    public void setSize(Dimension size) {
+        this.size = size;
+        super.setSize(size);
+        internalPanel.setSize(size);
+        valueLabel.setSize(size);
+        for(int i = 0; i < 9; i++)
+            if(notesLabels[i] != null) notesLabels[i].setSize(size);
     }
 
     /**
@@ -82,6 +106,45 @@ class CellGUI extends JPanel {
     }
 
     /**
+     * Set the value of the underlying Cell object.
+     * 
+     * This implementation allows for incorrect values to be highlighted.
+     * 
+     * @param value
+     */
+    public void setValue(int value, int expected) {
+        if(!selected) return;
+
+        cell.setValue(value);
+        valueLabel.setText(Integer.toString(cell.getValue()));
+
+        if(value != expected) {
+            incorrect = true;
+            errorStyle();
+        }
+
+        internalPanel.repaint();
+        internalPanel.revalidate();
+    }
+
+    /**
+     * Remove the value of the underlying Cell object.
+     */
+    public void removeValue() {
+        if(!selected) return;
+
+        cell.setValue(0);
+        if(!cell.isInitValue())
+            valueLabel.setText("");
+
+        incorrect = false;
+        highlightedStyle();
+
+        internalPanel.repaint();
+        internalPanel.revalidate();
+    }
+
+    /**
      * Set the possible values of the underlying Cell object.
      * 
      * @param value
@@ -96,8 +159,13 @@ class CellGUI extends JPanel {
      * @param value
      */
     public void addPossibleValue(int value) {
+        if(!selected) return;
+
         cell.addPossibleValue(value);
-        setNoteMode();
+        internalPanel.removeAll();
+        internalPanel.setLayout(noteLayout);
+        generateNotes();
+        highlightedStyle();
     }
 
     /**
@@ -155,24 +223,17 @@ class CellGUI extends JPanel {
 
     public void select() {
         selected = !selected;
-        
-        if(!selected) {
-            style();
-        } else {
-            setBackground(theme.getSecondaryBackground());
-            setForeground(theme.getSecondaryText());
-            internalPanel.setBackground(theme.getSecondaryBackground());
-            internalPanel.setForeground(theme.getSecondaryText());
-            valueLabel.setForeground(theme.getSecondaryText());
-            setBorder(new LineBorder(theme.getSecondaryBorder(), 2));
+        if(incorrect) {
+            errorStyle();
+            repaint();
+            revalidate();
+            return;
+        }
 
-        for(int i = 0; i < 9; i++) {
-            if(notesLabels[i] != null) {
-                notesLabels[i].setBackground(theme.getSecondaryBackground());
-                notesLabels[i].setForeground(theme.getSecondaryText());
-            }
-        }
-        }
+        if(!selected)
+            defaultStyle();
+
+        else highlightedStyle();
         
         repaint();
         revalidate();
@@ -181,7 +242,7 @@ class CellGUI extends JPanel {
     /**
      * Style the cell with the appropriate colors from the theme.
      */
-    private void style() {
+    private void defaultStyle() {
         setBackground(theme.getPrimaryBackground());
         setForeground(theme.getPrimaryText());
         internalPanel.setBackground(theme.getPrimaryBackground());
@@ -193,6 +254,44 @@ class CellGUI extends JPanel {
             if(notesLabels[i] != null) {
                 notesLabels[i].setBackground(theme.getPrimaryBackground());
                 notesLabels[i].setForeground(theme.getPrimaryText());
+            }
+        }
+    }
+
+    /**
+     * Style the cell with the appropriate colors from the theme.
+     */
+    private void highlightedStyle() {
+        setBackground(theme.getSecondaryBackground());
+        setForeground(theme.getSecondaryText());
+        internalPanel.setBackground(theme.getSecondaryBackground());
+        internalPanel.setForeground(theme.getSecondaryText());
+        valueLabel.setForeground(theme.getSecondaryText());
+        setBorder(new LineBorder(theme.getSecondaryBorder(), 2));
+
+        for(int i = 0; i < 9; i++) {
+            if(notesLabels[i] != null) {
+                notesLabels[i].setBackground(theme.getSecondaryBackground());
+                notesLabels[i].setForeground(theme.getSecondaryText());
+            }
+        }
+    }
+
+    /**
+     * Style the cell with the appropriate colors from the theme.
+     */
+    private void errorStyle() {
+        setBackground(theme.getErrorBackground());
+        setForeground(theme.getErrorText());
+        internalPanel.setBackground(theme.getErrorBackground());
+        internalPanel.setForeground(theme.getErrorText());
+        valueLabel.setForeground(theme.getErrorText());
+        setBorder(new LineBorder(theme.getErrorBorder(), 2));
+
+        for(int i = 0; i < 9; i++) {
+            if(notesLabels[i] != null) {
+                notesLabels[i].setBackground(theme.getErrorBackground());
+                notesLabels[i].setForeground(theme.getErrorText());
             }
         }
     }

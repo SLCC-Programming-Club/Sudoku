@@ -41,6 +41,9 @@ public class Settings {
     // The default dimension of the application window.
     private Dimension dimension;
 
+    // The default dimension of the cells in the application window.
+    private Dimension cellDimension;
+
     // Resizable setting
     private boolean resizable;
 
@@ -55,6 +58,9 @@ public class Settings {
 
     // Auto-fill notes
     private boolean autoFillNotes;
+
+    // Auto check values
+    private boolean autoCheckValues;
 
     /**
      * Create a new Settings object, initializing the default settings
@@ -311,6 +317,53 @@ public class Settings {
     }
 
     /**
+     * The Auto-check values setting is a configurable setting, where the user
+     * can specify whether values should be automatically checked when placed
+     * in a cell.
+     * 
+     * By default, the auto-check values setting is set to false.
+     * 
+     * @return
+     */
+    public boolean getAutoCheckValues() {
+        return autoCheckValues;
+    }
+
+    /**
+     * Set the auto-check values setting and write it to the settings file.
+     * 
+     * @param autoCheckValues
+     */
+    public void setAutoCheckValues(boolean autoCheckValues) {
+        this.autoCheckValues = autoCheckValues;
+        updateSettingsFile();
+    }
+
+    /**
+     * The default dimensions of the cells in the application window.
+     * 
+     * The default dimensions are set to 50x50 pixels.
+     * 
+     * @return
+     */
+    public Dimension getCellDimensions() {
+        return cellDimension;
+    }
+
+    private void setCellDimensions() {
+        int height;
+        int width;
+
+        if(dimension.height < 500) height = 50;
+        else height = dimension.height / 10;
+
+        if(dimension.width < 500) width = 50;
+        else width = dimension.width / 10;
+
+        cellDimension = new Dimension(width, height);
+    }
+
+    /**
      * Open and write the settings to the settings file.
      * 
      * This method is called whenever a setting is updated.
@@ -346,7 +399,9 @@ public class Settings {
         cellGUIStartMode = false;
         defaultOpenState = 0;
         theme = new Theme(new File(appDirectory + "default.theme"));
-        autoFillNotes = true;
+        autoFillNotes = false;
+        autoCheckValues = true;
+        setCellDimensions();
 
         updateSettingsFile();
     }

@@ -32,6 +32,8 @@ import java.io.File;
  * It provides colors for various GUI elements.
  */
 public class Theme {
+    private File theme;
+
     private Color primaryBackground;
     private Color secondaryBackground;
     private Color primaryText;
@@ -46,6 +48,9 @@ public class Theme {
     private Color secondaryButtonHighlight;
     private Color primaryButtonBorder;
     private Color secondaryButtonBorder;
+    private Color errorBackground;
+    private Color errorText;
+    private Color errorBorder;
 
     /**
      * Constructs a new Theme object with the given theme file.
@@ -77,6 +82,9 @@ public class Theme {
         secondaryText = Color.decode("#4A245E");
         primaryBorder = Color.decode("#A76BCA");
         secondaryBorder = Color.decode("#DBABF7");
+        errorBackground = Color.decode("#FF0000");
+        errorText = Color.decode("#FFFFFF");
+        errorBorder = Color.decode("#FF0000");
     }
 
     /**
@@ -331,5 +339,57 @@ public class Theme {
         this.secondaryButtonBorder = secondaryButtonBorder;
     }
 
-    private File theme;
+    /**
+     * Gets the error background color.
+     *
+     * @return the error background color
+     */
+    public Color getErrorBackground() {
+        return errorBackground;
+    }
+
+    /**
+     * Sets the error background color.
+     *
+     * @param errorBackground the error background color
+     */
+    public void setErrorBackground(Color errorBackground) {
+        this.errorBackground = errorBackground;
+    }
+
+    /**
+     * Gets the error text color.
+     *
+     * @return the error text color
+     */
+    public Color getErrorText() {
+        return errorText;
+    }
+
+    /**
+     * Sets the error text color.
+     *
+     * @param errorText the error text color
+     */
+    public void setErrorText(Color errorText) {
+        this.errorText = errorText;
+    }
+
+    /**
+     * Gets the error border color.
+     *
+     * @return the error border color
+     */
+    public Color getErrorBorder() {
+        return errorBorder;
+    }
+
+    /**
+     * Sets the error border color.
+     *
+     * @param errorBorder the error border color
+     */
+    public void setErrorBorder(Color errorBorder) {
+        this.errorBorder = errorBorder;
+    }
 }
