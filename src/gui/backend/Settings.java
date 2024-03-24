@@ -346,7 +346,7 @@ public class Settings {
         cellGUIStartMode = false;
         defaultOpenState = 0;
         theme = new Theme(new File(appDirectory + "default.theme"));
-        autoFillNotes = true;
+        autoFillNotes = false;
 
         updateSettingsFile();
     }

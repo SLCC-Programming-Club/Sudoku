@@ -81,6 +81,53 @@ public class Board extends JPanel {
     }
 
     /**
+     * Select the given cell and highlight all cells in the same row, column,
+     * and box.
+     * 
+     * Intended to be used in conjunction with a MouseListener.
+     * 
+     * @param cell
+     */
+    private void select(Cell cell) {
+        for(int n = 0; n < 9; n++) {
+            int row = cell.getRow();
+            int col = cell.getCol();
+            boolean colInSameBox = 
+                (gridGUI[n][col].cell.getBox() == 
+                cell.getBox());
+
+            boolean rowInSameBox = 
+                (gridGUI[row][n].cell.getBox() ==
+                cell.getBox());
+
+            if(colInSameBox && !rowInSameBox) {
+                gridGUI[row][n].select();
+                continue;
+            } else if(!colInSameBox && rowInSameBox) {
+                gridGUI[n][col].select();
+                continue;
+            } else if(colInSameBox && rowInSameBox) continue;
+
+            gridGUI[n][col].select();
+            gridGUI[row][n].select();
+        }
+
+        int boxRow = cell.getRow() / 3;
+        int boxCol = cell.getCol() / 3;
+        for(int n = 0; n < 3; n++) {
+            for(int m = 0; m < 3; m++) {
+                int row = boxRow * 3 + n;
+                int col = boxCol * 3 + m;
+                
+                // Skip the user-selected cell for clearer highlighting.
+                if(row == cell.getRow() && col == cell.getCol()) continue;
+
+                gridGUI[row][col].select();
+            }
+        }
+    }
+
+    /**
      * Create the Board Panel with the appropriate cells.
      */
     private void createBoard() {
@@ -96,54 +143,10 @@ public class Board extends JPanel {
                 );
                 cell.addMouseListener(new MouseListener() {
                     @Override
-                    public void mouseClicked(java.awt.event.MouseEvent e) {
-                        // If a cell is already selected, deselect it and
-                        // the row and column.
-                        if(selected != null) {
-                            int boxRow = selected.cell.getRow() / 3;
-                            int boxCol = selected.cell.getCol() / 3;
-
-                            for(int n = 0; n < 9; n++) {
-                                int row = selected.cell.getRow();
-                                int col = selected.cell.getCol();
-
-                                if((n == selected.cell.getCol()) || (n == selected.cell.getRow()))
-                                    continue;
-
-                                gridGUI[n][col].select();
-                                gridGUI[row][n].select();
-                            }
-
-                            for(int n = 0; n < 3; n++) {
-                                for(int m = 0; m < 3; m++) {
-                                    int row = boxRow * 3 + n;
-                                    int col = boxCol * 3 + m;
-                                    if(row == selected.cell.getRow() || col == selected.cell.getCol()) continue;
-
-                                    gridGUI[row][col].select();
-                                }
-                            }
-                        }
-
-                        // Graphically highlight the row and column
-                        // of the selected cell.
-                        for(int n = 0; n < 9; n++) {
-                            gridGUI[n][cell.cell.getCol()].select();
-                            gridGUI[cell.cell.getRow()][n].select();
-                        }
-
+                    public void mouseClicked(java.awt.event.MouseEvent e) { 
+                        if(selected != null) select(selected.cell);
+                        select(cell.cell);
                         selected = cell;
-                        int boxRow = selected.cell.getRow() / 3;
-                        int boxCol = selected.cell.getCol() / 3;
-                        for(int n = 0; n < 3; n++) {
-                            for(int m = 0; m < 3; m++) {
-                                int row = boxRow * 3 + n;
-                                int col = boxCol * 3 + m;
-                                if(row == selected.cell.getRow() || col == selected.cell.getCol()) continue;
-
-                                gridGUI[row][col].select();
-                            }
-                        }
                     }
                     @Override
                     public void mousePressed(java.awt.event.MouseEvent e) {}
@@ -193,20 +196,15 @@ public class Board extends JPanel {
             this.theme = theme;
             selected = false;
             setLayout(valueLayout);
+            valueLabel = new JLabel("", SwingConstants.CENTER);
             style();
 
             // Populate the cell with the appropriate value or notes.
             if(cell.getValue() == 0) {
-                valueLabel = new JLabel("");
-                valueLabel.setForeground(theme.getPrimaryText());
                 internalPanel.setLayout(noteLayout);
                 generateNotes();
             } else {
-                valueLabel = new JLabel(
-                    Integer.toString(cell.getValue()),
-                    SwingConstants.CENTER
-                );
-                valueLabel.setForeground(theme.getPrimaryText());
+                valueLabel.setText(Integer.toString(cell.getValue()));
                 internalPanel.setLayout(valueLayout);
                 internalPanel.add(valueLabel);
             }
@@ -249,6 +247,7 @@ public class Board extends JPanel {
          */
         public void addPossibleValue(int value) {
             cell.addPossibleValue(value);
+            setNoteMode();
         }
 
         /**
@@ -299,18 +298,13 @@ public class Board extends JPanel {
             selected = !selected;
             
             if(!selected) {
-                setBackground(theme.getPrimaryBackground());
-                setForeground(theme.getPrimaryText());
-                internalPanel.setBackground(theme.getPrimaryBackground());
-                internalPanel.setForeground(theme.getPrimaryText());
-                valueLabel.setForeground(theme.getPrimaryText());
-                setBorder(new LineBorder(theme.getPrimaryBorder(), 2));
+                style();
             } else {
                 setBackground(theme.getSecondaryBackground());
                 setForeground(theme.getSecondaryText());
                 internalPanel.setBackground(theme.getSecondaryBackground());
                 internalPanel.setForeground(theme.getSecondaryText());
-                valueLabel.setForeground(theme.getPrimaryText());
+                valueLabel.setForeground(theme.getSecondaryText());
                 setBorder(new LineBorder(theme.getSecondaryBorder(), 2));
             }
             
@@ -326,6 +320,7 @@ public class Board extends JPanel {
             setForeground(theme.getPrimaryText());
             internalPanel.setBackground(theme.getPrimaryBackground());
             internalPanel.setForeground(theme.getPrimaryText());
+            valueLabel.setForeground(theme.getPrimaryText());
             setBorder(new LineBorder(theme.getPrimaryBorder(), 2));
         }
 
