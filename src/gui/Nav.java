@@ -255,7 +255,6 @@ public class Nav extends JPanel {
         }
 
         // Otherwise, open the file and populate the grid.
-        System.out.println("Opening the file " + filename + ".sdku.");
         createGrid(f);
     }
 

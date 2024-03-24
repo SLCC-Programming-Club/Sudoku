@@ -1,6 +1,7 @@
 package gui;
 
 import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 import gui.backend.Theme;
 
@@ -20,7 +21,7 @@ public class Note extends JLabel {
      * @param t
      */
     public Note(String text, Theme t) {
-        super(text);
+        super(text, SwingConstants.CENTER);
         this.t = t;
         style();
     }

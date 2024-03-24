@@ -40,9 +40,10 @@ public class SudokuChecker {
     public Cell[][] getPossibleValues(Cell[][] grid) {
         for(int row = 0; row < grid.length; row++) {
             for(int col = 0; col < grid[row].length; col++) {
-                if(grid[row][col].getValue() == 0)
+                if(grid[row][col].getValue() != 0)
                     continue;
 
+                // Replace intersection with union?
                 ArrayList<Integer> intersection = intersection(
                     getRowRemainingNumbers(row),
                     getColRemainingNumbers(col)
@@ -65,6 +66,7 @@ public class SudokuChecker {
             }
         }
 
+        this.grid = grid;
         return grid;
     }
 
@@ -98,6 +100,31 @@ public class SudokuChecker {
 
         return intersection;
     }
+
+    /**
+     * Determine what numbers are available to be placed in the given cell of
+     * the grid. This is effectively an union of the numbers available in the
+     * row, column, and box of the cell.
+     * 
+     * @param row
+     * @param col
+     */
+     private ArrayList<Integer> union(
+        ArrayList<Integer> a,
+        ArrayList<Integer> b
+     ) {
+        ArrayList<Integer> union = new ArrayList<Integer>();
+        for(int i = 0; i < a.size(); i++) {
+            union.add(a.get(i));
+        }
+        for(int i = 0; i < b.size(); i++) {
+            if(!union.contains(b.get(i))) {
+                union.add(b.get(i));
+            }
+        }
+
+        return union;
+     }
 
      /**
      * Determine what numbers are available to be placed in the given cell of

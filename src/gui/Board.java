@@ -1,9 +1,12 @@
 package gui;
 
+import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
+import java.awt.event.MouseListener;
 
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.JLabel;
 
@@ -83,6 +86,21 @@ public class Board extends JPanel {
         for(int i = 0; i < 9; i++) {
             for(int j = 0; j < 9; j++) {
                 CellGUI cell = new CellGUI(grid[i][j], s.getCellGUIStartMode() || s.getAutoFillNotes(), s.getTheme());
+                cell.addMouseListener(new MouseListener() {
+                    @Override
+                    public void mouseClicked(java.awt.event.MouseEvent e) {
+                        cell.setNoteMode();
+                    }
+                    @Override
+                    public void mousePressed(java.awt.event.MouseEvent e) {}
+                    @Override
+                    public void mouseReleased(java.awt.event.MouseEvent e) {}
+                    @Override
+                    public void mouseEntered(java.awt.event.MouseEvent e) {}
+                    @Override
+                    public void mouseExited(java.awt.event.MouseEvent e) {}
+                
+                });
                 add(cell);
             }
         }
@@ -92,13 +110,16 @@ public class Board extends JPanel {
      * GUI representation of a single cell in the Sudoku grid.
      */
     private class CellGUI extends JPanel {
-        private GridLayout noteLayout = new GridLayout(3, 3);
-        private GridLayout valueLayout = new GridLayout(1, 1);
-        private Theme theme;
-
-        private Cell cell;
+        // GUI fields
+        private JPanel internalPanel = new JPanel(new BorderLayout());
+            private GridLayout noteLayout = new GridLayout(3, 3);
+            private GridLayout valueLayout = new GridLayout(0, 1);
         private JLabel valueLabel;
         private Note[] notesLabels = new Note[9];
+        private Theme theme;
+
+        // Data fields
+        private Cell cell;
         private boolean noteMode; // true to display notes, or display value
 
         /**
@@ -112,19 +133,22 @@ public class Board extends JPanel {
         public CellGUI(Cell cell, boolean noteMode, Theme theme) {
             super();
             this.cell = cell;
-            this.noteMode = noteMode;
+            this.noteMode = !noteMode; // Flip for use with setNoteMode()
             this.theme = theme;
+            setLayout(valueLayout);
             style();
 
             // Populate the cell with the appropriate value or notes.
             if(cell.getValue() == 0) {
-                noteMode = !noteMode; // Flip for use with setNoteMode()
                 valueLabel = new JLabel("");
-                setNoteMode();
             } else {
-                valueLabel = new JLabel(Integer.toString(cell.getValue()));
-                add(valueLabel);
+                valueLabel = new JLabel(
+                    Integer.toString(cell.getValue()),
+                    SwingConstants.CENTER
+                );
             }
+            setNoteMode();
+            add(internalPanel);
         }
 
         /**
@@ -143,7 +167,8 @@ public class Board extends JPanel {
          */
         public void setValue(int value) {
             cell.setValue(value);
-            valueLabel.setText(Integer.toString(value));
+            // Update the GUI with the actual Cell value (unchanged if invalid)
+            valueLabel.setText(Integer.toString(cell.getValue()));
         }
 
         /**
@@ -189,23 +214,20 @@ public class Board extends JPanel {
          * If the current mode is value, switch to note mode, and vice versa.
          */
         public void setNoteMode() {
-            removeAll();
+            internalPanel.removeAll();
             if(noteMode) {
-                setLayout(valueLayout);
-
-                add(valueLabel);
+                internalPanel.setLayout(valueLayout);
+                internalPanel.add(valueLabel);
             } else {
-                setLayout(noteLayout);
-
+                internalPanel.setLayout(noteLayout);
                 generateNotes();
-                for(int i = 0; i < 9; i++)
-                    add(notesLabels[i]);
-
-                System.out.println("Displaying notes.");
             }
             
+            internalPanel.repaint();
+            internalPanel.revalidate();
             repaint();
             revalidate();
+
             noteMode = !noteMode;
         }
 
@@ -222,23 +244,24 @@ public class Board extends JPanel {
          * Create the GUI components for the cell.
          */
         private void generateNotes() {
-            if(cell.getPossibleValues().length == 0) {
+            int[] possibleValues = cell.getPossibleValues();
+            if(possibleValues.length == 0) {
                 for(int i = 0; i < 9; i++) {
                     notesLabels[i] = new Note("", theme);
-                    add(notesLabels[i]);
+                    internalPanel.add(notesLabels[i]);
                 }
                 return;
             }
 
-
+            int index = 0;
             // Add the noted possible values to the cell.
-            for(int i = 1; i <= 9; i++) {
-                if(cell.getPossibleValues()[i - 1] == i)
+            for(int i = 1; i <= 9 && index < possibleValues.length; i++) {
+                if(possibleValues[index] == i) {
                     notesLabels[i - 1] = new Note(Integer.toString(i), theme);
-                else
+                    index++;
+                } else
                     notesLabels[i - 1] = new Note("", theme);
-
-                add(notesLabels[i - 1]);
+                internalPanel.add(notesLabels[i - 1]);
             }
         }
     }

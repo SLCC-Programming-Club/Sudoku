@@ -306,6 +306,7 @@ public class Settings {
      */
     public void setAutoFillNotes(boolean autoFillNotes) {
         this.autoFillNotes = autoFillNotes;
+        setCellGUIStartMode(autoFillNotes);
         updateSettingsFile();
     }
 
@@ -340,9 +341,9 @@ public class Settings {
         else 
             font = new Font("Arial", Font.PLAIN, 12);
 
-        dimension = new Dimension(750, 550);
+        dimension = new Dimension(1000, 1000);
         resizable = false;
-        cellGUIStartMode = false;
+        cellGUIStartMode = true;
         defaultOpenState = 0;
         theme = new Theme(new File(appDirectory + "default.theme"));
         autoFillNotes = true;
