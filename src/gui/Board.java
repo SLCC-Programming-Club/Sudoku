@@ -107,10 +107,8 @@ public class Board extends JPanel {
                                 int row = selected.cell.getRow();
                                 int col = selected.cell.getCol();
 
-                                if(
-                                    (row == selected.cell.getRow() && n == selected.cell.getCol()) ||
-                                    (col == selected.cell.getCol() && n == selected.cell.getRow())
-                                ) continue;
+                                if((n == selected.cell.getCol()) || (n == selected.cell.getRow()))
+                                    continue;
 
                                 gridGUI[n][col].select();
                                 gridGUI[row][n].select();
@@ -142,11 +140,6 @@ public class Board extends JPanel {
                                 int row = boxRow * 3 + n;
                                 int col = boxCol * 3 + m;
                                 if(row == selected.cell.getRow() || col == selected.cell.getCol()) continue;
-
-                                if(
-                                    (row == selected.cell.getRow() && n == selected.cell.getCol()) ||
-                                    (col == selected.cell.getCol() && n == selected.cell.getRow())
-                                ) continue;
 
                                 gridGUI[row][col].select();
                             }
