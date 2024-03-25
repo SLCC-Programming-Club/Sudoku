@@ -173,7 +173,7 @@ public class SudokuChecker {
         else if(intersection.size() == 1) {
             int value = intersection.get(0);
 
-            grid[row][col].setValue(value);
+            grid[row][col].setValue(value, true);
             updatePossibleValues(row, col);
             return;
         } else {
@@ -203,14 +203,14 @@ public class SudokuChecker {
             if(grid[row][i].getValue() == 0) {
                 grid[row][i].removePossibleValue(value);
                 if(grid[row][i].getPossibleValues().length == 1) {
-                    grid[row][i].setValue(grid[row][i].getPossibleValues()[0]);
+                    grid[row][i].setValue(grid[row][i].getPossibleValues()[0], true);
                     updatePossibleValues(row, i);
                 }
             }
             if(grid[i][col].getValue() == 0) {
                 grid[i][col].removePossibleValue(value);
                 if(grid[i][col].getPossibleValues().length == 1) {
-                    grid[i][col].setValue(grid[i][col].getPossibleValues()[0]);
+                    grid[i][col].setValue(grid[i][col].getPossibleValues()[0], true);
                     updatePossibleValues(i, col);
                 }
             }

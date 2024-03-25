@@ -120,6 +120,34 @@ public class Board extends JPanel {
     }
 
     /**
+     * Create the Board Panel with the appropriate cells.
+     * 
+     * Every CellGUI object is created with the appropriate Cell object and
+     * Settings object. The CellGUI objects are then added to the Board Panel.
+     * 
+     * Each CellGUI object is also given a MouseListener to handle user input,
+     * and a KeyListener to handle keyboard input if/when the cell is selected.
+     */
+    private void createBoard() {
+        if(s.getAutoFillNotes()) grid = sc.getPossibleValues(grid);
+        gridGUI = new CellGUI[9][9];
+
+        for(int i = 0; i < 9; i++) {
+            for(int j = 0; j < 9; j++) {
+                // Create a new CellGUI object with the appropriate Cell object.
+                CellGUI cell = new CellGUI(grid[i][j], s);
+
+                // Add a MouseListener to the cell.
+                cell.addMouseListener(createMouseListener(cell));
+
+                // Add the CellGUI object to the Board Panel.
+                gridGUI[i][j] = cell;
+                add(gridGUI[i][j]);
+            }
+        }
+    }
+
+    /**
      * Select the given cell and highlight all cells in the same row, column,
      * and box.
      * 
@@ -173,34 +201,6 @@ public class Board extends JPanel {
     }
 
     /**
-     * Create the Board Panel with the appropriate cells.
-     * 
-     * Every CellGUI object is created with the appropriate Cell object and
-     * Settings object. The CellGUI objects are then added to the Board Panel.
-     * 
-     * Each CellGUI object is also given a MouseListener to handle user input,
-     * and a KeyListener to handle keyboard input if/when the cell is selected.
-     */
-    private void createBoard() {
-        if(s.getAutoFillNotes()) grid = sc.getPossibleValues(grid);
-        gridGUI = new CellGUI[9][9];
-
-        for(int i = 0; i < 9; i++) {
-            for(int j = 0; j < 9; j++) {
-                // Create a new CellGUI object with the appropriate Cell object.
-                CellGUI cell = new CellGUI(grid[i][j], s);
-
-                // Add a MouseListener to the cell.
-                cell.addMouseListener(createMouseListener(cell));
-
-                // Add the CellGUI object to the Board Panel.
-                gridGUI[i][j] = cell;
-                add(gridGUI[i][j]);
-            }
-        }
-    }
-
-    /**
      * Create a MouseListener for CellGUI objects.
      * 
      * This MouseListener listens for mouse clicks, and selects the cell
@@ -248,11 +248,11 @@ public class Board extends JPanel {
             public void mouseReleased(MouseEvent e) {}
             @Override
             public void mouseEntered(MouseEvent e) {
-                if(selected == null) cell.select();
+                cell.select();
             }
             @Override
             public void mouseExited(MouseEvent e) {
-                if(selected == null) cell.select();
+                cell.select();
             }
         };
     }

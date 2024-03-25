@@ -65,7 +65,7 @@ class CellGUI extends JPanel {
         // Populate the cell with the appropriate value or notes.
         if(cell.getValue() == 0) {
             internalPanel.setLayout(noteLayout);
-            generateNotes(s.getAutoFillNotes());
+            generateNotes(noteMode);
         } else {
             internalPanel.setLayout(valueLayout);
             valueLabel.setText(Integer.toString(cell.getValue()));
@@ -86,12 +86,16 @@ class CellGUI extends JPanel {
     /**
      * Set the value of the underlying Cell object.
      * 
+     * This implementation is to be used when Settings.getAutoCheckValues
+     * is false. It will assume that every value the user enters is incorrect,
+     * and thus the underlying List of possible values is never cleared.
+     * 
      * @param value
      */
     public void setValue(int value) {
         if(!selected) return;
 
-        cell.setValue(value);
+        cell.setValue(value, false);
         // Update the GUI with the actual Cell value (unchanged if invalid)
         valueLabel.setText(Integer.toString(cell.getValue()));
         refresh();
@@ -100,18 +104,22 @@ class CellGUI extends JPanel {
     /**
      * Set the value of the underlying Cell object.
      * 
-     * This implementation allows for incorrect values to be highlighted.
+     * This implementation is to be used when Settings.getAutoCheckValues
+     * is true. It allows for incorrect values to be highlighted. And the
+     * underlying List of possible values to be cleared if the entered
+     * value is correct.
      * 
      * @param value
      */
     public void setValue(int value, int expected) {
         if(!selected) return;
 
-        cell.setValue(value);
+        cell.setValue(value, value == expected);
         valueLabel.setText(Integer.toString(cell.getValue()));
 
         if(value != expected) {
             incorrect = true;
+            valueLabel.setText(Integer.toString(value));
             errorStyle();
         } else refresh();
     }
@@ -122,7 +130,7 @@ class CellGUI extends JPanel {
     public void removeValue() {
         if(!selected) return;
 
-        cell.setValue(0);
+        cell.setValue(0, true);
         if(!cell.isInitValue())
             valueLabel.setText("");
 
@@ -166,25 +174,21 @@ class CellGUI extends JPanel {
 
     /**
      * Toggle the mode of the cell between value and note, including the
-     * layout of the cell.
-     * 
-     * If the current mode is value, switch to note mode, and vice versa.
+     * layout and visual content of the cell.
      */
     public void setNoteMode() {
         if(cell.isInitValue()) return;
 
-        internalPanel.removeAll();
         if(noteMode) {
+            internalPanel.removeAll();
             internalPanel.setLayout(valueLayout);
             internalPanel.add(valueLabel);
         } else {
             internalPanel.setLayout(noteLayout);
-            noteMode = true;
             generateNotes(true);
         }
         
         refresh();
-
         noteMode = !noteMode;
     }
 
@@ -196,11 +200,8 @@ class CellGUI extends JPanel {
         if(incorrect) {
             errorStyle();
             return;
-        }
-
-        if(!selected)
+        } else if(!selected)
             defaultStyle();
-
         else highlightedStyle();
     }
 
@@ -256,19 +257,9 @@ class CellGUI extends JPanel {
      * @see Theme.java
      */
     private void errorStyle() {
-        setBackground(theme.getErrorBackground());
-        setForeground(theme.getErrorText());
-        internalPanel.setBackground(theme.getErrorBackground());
-        internalPanel.setForeground(theme.getErrorText());
         valueLabel.setForeground(theme.getErrorText());
+        internalPanel.setBackground(theme.getErrorBackground());
         setBorder(new LineBorder(theme.getErrorBorder(), 2));
-
-        for(int i = 0; i < 9; i++) {
-            if(notesLabels[i] != null) {
-                notesLabels[i].setBackground(theme.getErrorBackground());
-                notesLabels[i].setForeground(theme.getErrorText());
-            }
-        }
 
         refresh();
     }
@@ -295,10 +286,7 @@ class CellGUI extends JPanel {
         int[] possibleValues = cell.getPossibleValues();
         
         // Prepare the internalPanel for noteMode.
-        if(autoFill) {
-            internalPanel.removeAll();
-            noteMode = true;
-        }
+        if(autoFill) internalPanel.removeAll();
 
         // Handle cases where there are no possible values stored.
         if(possibleValues.length == 0) {

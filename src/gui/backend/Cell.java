@@ -70,12 +70,16 @@ public class Cell {
      * 
      * The value must be between 1 and 9, inclusive.
      * 
+     * Additionally if the value is incorrect, then do not clear the
+     * possible values.
+     * 
      * @param value
+     * @param isCorrect
      */
-    public void setValue(int value) {
+    public void setValue(int value, boolean isCorrect) {
         if(initValue) return;
+        if(isCorrect) possibleValues.clear();
 
-        possibleValues.clear();
         this.value = value;
     }
 
