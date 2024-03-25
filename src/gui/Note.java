@@ -1,5 +1,7 @@
 package gui;
 
+import java.awt.Font;
+
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
@@ -13,6 +15,7 @@ import gui.backend.Theme;
  */
 public class Note extends JLabel {
     private Theme t;
+    private Font f;
     
     /**
      * Create a new Note object with the given text and theme.
@@ -20,9 +23,10 @@ public class Note extends JLabel {
      * @param text
      * @param t
      */
-    public Note(String text, Theme t) {
+    public Note(String text, Theme t, Font f) {
         super(text, SwingConstants.CENTER);
         this.t = t;
+        this.f = f;
         style();
     }
 
@@ -32,5 +36,6 @@ public class Note extends JLabel {
     private void style() {
         setBackground(t.getPrimaryBackground());
         setForeground(t.getPrimaryText());
+        setFont(f);
     }
 }

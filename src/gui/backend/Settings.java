@@ -388,13 +388,13 @@ public class Settings {
 
         // Load the font from the system directory.
         if(loadFont("HackNerdFont-Regular") == 0)
-            font = new Font("Hack Nerd Font", Font.PLAIN, 12);
+            font = new Font("Hack Nerd Font", Font.PLAIN, 16);
 
         // If the font does not exist, use Arial as the default font.
         else 
-            font = new Font("Arial", Font.PLAIN, 12);
+            font = new Font("Arial", Font.PLAIN, 16);
 
-        dimension = new Dimension(1000, 1000);
+        dimension = new Dimension(600, 800);
         resizable = false;
         cellGUIStartMode = false;
         defaultOpenState = 0;

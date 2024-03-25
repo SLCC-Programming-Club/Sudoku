@@ -166,41 +166,24 @@ public class Nav extends JPanel {
             fileOptions.addItem("Save");
             fileOptions.addItem("Exit");
 
-        fileOptions.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int selected = fileOptions.getSelectedIndex();
-                switch(selected) {
-                    case 0:
-                        newFile();
-                        break;
-                    case 1:
-                        openFile();
-                        break;
-                    case 2:
-                        saveFile();
-                        break;
-                    case 3:
-                        System.exit(0);
-                        break;
-                    default:
-                        System.out.println("Invalid selection.");
-                }
+        fileOptions.addActionListener(e -> {
+            int selected = fileOptions.getSelectedIndex();
+            switch(selected) {
+                case 0:
+                    newFile();
+                    break;
+                case 1:
+                    openFile();
+                    break;
+                case 2:
+                    saveFile();
+                    break;
+                case 3:
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Invalid selection.");
             }
-
-            @Override
-            public void mousePressed(MouseEvent e) {}
-
-            @Override
-            public void mouseReleased(MouseEvent e) {}
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                fileOptions.showPopup();
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {}
         });
 
         return fileOptions;

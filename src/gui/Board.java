@@ -186,9 +186,7 @@ public class Board extends JPanel {
             for(int j = 0; j < 9; j++) {
                 CellGUI cell = new CellGUI(
                     grid[i][j],
-                    s.getCellGUIStartMode(),
-                    s.getTheme(),
-                    s.getCellDimensions()
+                    s
                 );
                 cell.addMouseListener(new MouseListener() {
                     @Override

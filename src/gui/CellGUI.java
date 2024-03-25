@@ -2,14 +2,15 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
 import gui.backend.Cell;
+import gui.backend.Settings;
 import gui.backend.Theme;
 
 /**
@@ -24,6 +25,7 @@ class CellGUI extends JPanel {
     private JLabel valueLabel;
     private Note[] notesLabels = new Note[9];
     private Theme theme;
+    private Font font;
     private boolean incorrect;
 
     // Data fields
@@ -39,26 +41,31 @@ class CellGUI extends JPanel {
      * @param cell
      * @param startInNotesOrValueMode
      */
-    public CellGUI(Cell cell, boolean noteMode, Theme theme, Dimension size) {
+    public CellGUI(Cell cell, Settings s) {
         super();
         this.cell = cell;
-        this.noteMode = !noteMode; // Flip for use with setNoteMode()
-        this.theme = theme;
+        
+        // Set the initial state of the cell based off the settings.
+        noteMode = s.getCellGUIStartMode();
+        theme = s.getTheme();
+        font = s.getFont();
         selected = false;
+        size = s.getCellDimensions();
+
         setFocusable(true);
         setLayout(valueLayout);
-        valueLabel = new JLabel("", SwingConstants.CENTER);
-        this.size = size;
-        setSize(this.size);
+        valueLabel = new Note("", theme, font);
+        setSize(size);
+        internalPanel.setSize(size);
         defaultStyle();
 
         // Populate the cell with the appropriate value or notes.
         if(cell.getValue() == 0) {
             internalPanel.setLayout(noteLayout);
-            generateNotes();
+            generateNotes(s.getAutoFillNotes());
         } else {
-            valueLabel.setText(Integer.toString(cell.getValue()));
             internalPanel.setLayout(valueLayout);
+            valueLabel.setText(Integer.toString(cell.getValue()));
             internalPanel.add(valueLabel);
         }
         add(internalPanel);
@@ -145,15 +152,6 @@ class CellGUI extends JPanel {
     }
 
     /**
-     * Set the possible values of the underlying Cell object.
-     * 
-     * @param value
-     */
-    public void setPossibleValues(int[] values) {
-        cell.setPossibleValues(values);
-    }
-
-    /**
      * Add a possible value to the cell.
      * 
      * @param value
@@ -164,7 +162,8 @@ class CellGUI extends JPanel {
         cell.addPossibleValue(value);
         internalPanel.removeAll();
         internalPanel.setLayout(noteLayout);
-        generateNotes();
+        noteMode = true;
+        generateNotes(true);
         highlightedStyle();
     }
 
@@ -175,15 +174,6 @@ class CellGUI extends JPanel {
      */
     public void removePossibleValue(int value) {
         cell.removePossibleValue(value);
-    }
-
-    /**
-     * Get the possible values of the underlying Cell object.
-     * 
-     * @return int[]
-     */
-    public int[] getPossibleValues() {
-        return cell.getPossibleValues();
     }
 
     /**
@@ -210,7 +200,8 @@ class CellGUI extends JPanel {
             internalPanel.add(valueLabel);
         } else {
             internalPanel.setLayout(noteLayout);
-            generateNotes();
+            noteMode = true;
+            generateNotes(true);
         }
         
         internalPanel.repaint();
@@ -221,6 +212,9 @@ class CellGUI extends JPanel {
         noteMode = !noteMode;
     }
 
+    /**
+     * Select the cell, and style it for error, highlight, or default.
+     */
     public void select() {
         selected = !selected;
         if(incorrect) {
@@ -297,14 +291,16 @@ class CellGUI extends JPanel {
     }
 
     /**
-     * Create the GUI components for the cell.
+     * Create the GUI components for the cell's notes.
+     * 
+     * @param autoFill
      */
-    private void generateNotes() {
+    private void generateNotes(boolean autoFill) {
         int[] possibleValues = cell.getPossibleValues();
         if(possibleValues.length == 0) {
             for(int i = 0; i < 9; i++) {
-                notesLabels[i] = new Note("", theme);
-                internalPanel.add(notesLabels[i]);
+                notesLabels[i] = new Note("", theme, font);
+                if(autoFill) internalPanel.add(notesLabels[i]);
             }
             return;
         }
@@ -313,11 +309,11 @@ class CellGUI extends JPanel {
         // Add the noted possible values to the cell.
         for(int i = 1; i <= 9 && index < possibleValues.length; i++) {
             if(possibleValues[index] == i) {
-                notesLabels[i - 1] = new Note(Integer.toString(i), theme);
+                notesLabels[i - 1] = new Note(Integer.toString(i), theme, font);
                 index++;
             } else
-                notesLabels[i - 1] = new Note("", theme);
-            internalPanel.add(notesLabels[i - 1]);
+                notesLabels[i - 1] = new Note("", theme, font);
+            if(autoFill) internalPanel.add(notesLabels[i - 1]);
         }
     }
 }
