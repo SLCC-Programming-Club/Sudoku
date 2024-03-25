@@ -230,20 +230,6 @@ public class Cell {
             max = 0;
             min = 0;
         }
-
-        /**
-         * Create a new List with the given initial value.
-         * 
-         * By default, the head and tail are the same, the size is 1, and the max and min are the initial value.
-         * @param initValue
-         */
-        public List(int initValue) {
-            head = new Value(initValue);
-            tail = head;
-            size = 1;
-            max = initValue;
-            min = initValue;
-        }
         
         /**
          * Create a new List with the given initial values.

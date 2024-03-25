@@ -6,7 +6,8 @@ import java.io.File;
 /**
  * The Theme class represents the color scheme for the GUI components.
  * 
- * The Theme class reads a theme file and sets the colors for the GUI components.
+ * The Theme class reads a .theme file and sets the colors for the GUI components.
+ * .theme files are .json files for standardized data processing.
  * 
  * The Theme class provides the following color customizations:
  *      - primaryBackground
@@ -24,16 +25,7 @@ import java.io.File;
  *      - primaryButtonBorder
  *      - secondaryButtonBorder
  */
-import java.awt.Color;
-import java.io.File;
-
-/**
- * The Theme class represents a theme for the GUI components.
- * It provides colors for various GUI elements.
- */
 public class Theme {
-    private File theme;
-
     private Color primaryBackground;
     private Color secondaryBackground;
     private Color primaryText;
@@ -58,16 +50,15 @@ public class Theme {
      *
      * @param theme the theme file
      */
-    public Theme(File theme) {
-        this.theme = theme;
-        readTheme();
+    public Theme(File file) {
+        readTheme(file);
     }
 
     /**
      * Reads the .theme file and sets the colors for the GUI components.
      * Once complete, sets the theme for the GUI components.
      */
-    private void readTheme() {
+    private void readTheme(File file) {
         // TODO: Read the .theme file
         setTheme();
     }

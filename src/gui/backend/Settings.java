@@ -18,10 +18,18 @@ import java.awt.FontFormatException;
  * system.
  * 
  * (Currently) Configurable settings include:
- *      - Default Directory
- *      - New File Properties
- *      - Font
- * 
+ *      - Default puzzles directory for .sdku files;
+ *      - New file Properties;
+ *      - Font;
+ *      - Window size;
+ *      - Window resizing (experimental);
+ *      - Cell start mode, meaning if a cell is blank and selected, input
+ *          is either going to the notes or entering a value;
+ *      - Application default open behavior;
+ *      - Theme, specifically by providing a default.theme file formatted for JSON;
+ *      - Auto-fill notes with possible values;
+ *      - Auto-check user-entered values with the correct values;
+ *      - Auto-save and auto-save frequency;
  */
 public class Settings {
     private final String os;
@@ -62,6 +70,12 @@ public class Settings {
     // Auto check values
     private boolean autoCheckValues;
 
+    // Auto-save whenever a new note or value is changed.
+    private boolean autoSave;
+
+    // Auto-save frequency
+    private int autoSaveFrequency;
+
     /**
      * Create a new Settings object, initializing the default settings
      * or reading in the settings from settings file if it exists.
@@ -70,6 +84,8 @@ public class Settings {
      * the settings file is located. The settings file is always located in
      * either "~/.config/sudoku/" or "%APPDATA%/Local/Sudoku/", depending
      * on the user's operating system.
+     * 
+     * The settings file is settings.json.
      */
     public Settings() {
         os = System.getProperty("os.name").toLowerCase();
@@ -81,12 +97,114 @@ public class Settings {
                             "/.config/sudoku/";
 
         File dir = new File(appDirectory);
+        
+        // If the app directory does not exist, create it and populate a
+        // settings.json file with the default settings.
         if (!dir.exists() || !dir.isDirectory()) {
             dir.mkdirs();
-
             defaultSettings();
+            updateSettingsFile();
+
+        } else readSettings();
+    }
+
+    /**
+     * Set the default settings for the application and write them to the
+     * settings file.
+     */
+    private void defaultSettings() {
+        // Setup the default directory for .sdku puzzle files.
+        defaultDirectory = appDirectory + "puzzles";
+        File dir = new File(defaultDirectory);
+
+        // Create the puzzles directory.
+        if(!dir.exists() || !dir.isDirectory())
+            dir.mkdirs();
+
+        // Load the font from the system directory.
+        if(loadFont("HackNerdFont-Regular") == 0)
+            font = new Font("Hack Nerd Font", Font.PLAIN, 16);
+
+        // If the font does not exist, use Arial as the default font.
+        else 
+            font = new Font("Arial", Font.PLAIN, 16);
+
+        // Set other default settings.
+        newFileProperties = 0;
+        dimension = new Dimension(600, 800);
+        resizable = false;
+        cellGUIStartMode = false;
+        defaultOpenState = 0;
+        theme = new Theme(new File(appDirectory + "default.theme"));
+        autoFillNotes = false;
+        autoCheckValues = true;
+        autoSave = false;
+        autoSaveFrequency = 0;
+        setCellDimensions();
+
+        // Write the default settings to the settings.json file.
+        updateSettingsFile();
+    }
+
+    /**
+     * Open and write the settings to the settings file.
+     * 
+     * This method is called whenever a setting is updated.
+     */
+    private void updateSettingsFile() {
+        // TODO: Write the settings to the settings file.
+    }
+
+    /**
+     * Read the settings from the settings file.
+     * 
+     * If the settings file does not exist, the default settings will be used
+     * to populate the Settings file.
+     */
+     private void readSettings() {
+        File settingsFile = new File(appDirectory + "/settings.json");
+        if (!settingsFile.exists() && !settingsFile.isDirectory()) {
+            defaultSettings();
+            return;
         }
-        readSettings();
+
+        // TODO: Read the settings from the settings file.
+     }
+
+    /**
+     * Load the font from the resources folder in the user's system directory.
+     * 
+     * @return int 0 if successful, 1 if the file does not exist.
+     */
+    private int loadFont(String fontName) {
+        // Load the font from the system directory.
+        String fontFilepath;
+        if(os.startsWith("windows"))
+            fontFilepath = System.getProperty("user.home") + 
+                            "\\AppData\\Local\\Microsoft\\Windows\\Fonts\\" +
+                            fontName + ".ttf";
+        else if(os.startsWith("mac"))
+            fontFilepath = "/Library/Fonts/" + fontName + ".ttf";
+        else
+            fontFilepath = "/usr/share/fonts/" + fontName + ".ttf";
+
+        // Register the font with the GraphicsEnvironment.
+        try {
+            GraphicsEnvironment ge = GraphicsEnvironment.
+                getLocalGraphicsEnvironment();
+
+            ge.registerFont(Font.createFont(
+                Font.TRUETYPE_FONT,
+                new File(fontFilepath)
+            ));
+
+            return 0;
+
+        } catch(IOException | FontFormatException e) {
+            System.out.println("Filepath of font not found: " +
+                                fontFilepath + " does not exist.");
+            return 1;
+        }
     }
 
     /**
@@ -117,9 +235,11 @@ public class Settings {
     /**
      * New File Properties is a configurable setting, where the following
      * values are allowable:
-     *      0 - Load the last opened .sdku file, default behavior
-     *      1 - Create a new, blank .sdku file
-     *      2 - Create a new, random .sdku file
+     *      0 - Create a new, blank .sdku file
+     *      1 - Create a new, random .sdku file
+     * 
+     * Integer is being used instead of boolean since additional properties
+     * may be added in the future.
      *
      * @return int
      */
@@ -364,97 +484,58 @@ public class Settings {
     }
 
     /**
-     * Open and write the settings to the settings file.
+     * Auto-save is a user-configurable setting to automatically save the
+     * puzzle anytime they make a change. Additionally, auto-save will 
+     * result in the file being automatically saved every 60 seconds, to
+     * preserve the elapsed time tracking.
      * 
-     * This method is called whenever a setting is updated.
+     * @return boolean
      */
-    private void updateSettingsFile() {
-        // TODO: Write the settings to the settings file.
+    public boolean getAutoSave() {
+        return autoSave;
     }
 
     /**
-     * Set the default settings for the application and write them to the
-     * settings file.
+     * Set the auto-save feature to a specified state.
+     * 
+     * @param autoSave
      */
-    private void defaultSettings() {
-        // Setup the default directory for .sdku puzzle files.
-        defaultDirectory = appDirectory + "puzzles";
-        File dir = new File(defaultDirectory);
-
-        if(!dir.exists() || !dir.isDirectory())
-            dir.mkdirs();
-
-        newFileProperties = 0;
-
-        // Load the font from the system directory.
-        if(loadFont("HackNerdFont-Regular") == 0)
-            font = new Font("Hack Nerd Font", Font.PLAIN, 16);
-
-        // If the font does not exist, use Arial as the default font.
-        else 
-            font = new Font("Arial", Font.PLAIN, 16);
-
-        dimension = new Dimension(600, 800);
-        resizable = false;
-        cellGUIStartMode = false;
-        defaultOpenState = 0;
-        theme = new Theme(new File(appDirectory + "default.theme"));
-        autoFillNotes = false;
-        autoCheckValues = true;
-        setCellDimensions();
-
+    public void setAutoSave(boolean autoSave) {
+        this.autoSave = autoSave;
         updateSettingsFile();
     }
 
     /**
-     * Read the settings from the settings file.
+     * The auto save frequnecy, in seconds.
      * 
-     * If the settings file does not exist, the default settings will be used
-     * to populate the Settings file.
+     * By default, auto-save will save whenever the user makes changes on the
+     * puzzle. However, since elapsed time and other future features are not
+     * user-controlled events, the frequency is used to specify in a separate
+     * thread how often the .sdku file should be saved.
+     * 
+     * For performance and realistic necessity for preserving this kind of
+     * information, the frequency should (not required) be following:
+     *      - 0: off;
+     *      - 5: 5 second intervals;
+     *      - 30: 30 second intervals;
+     *      - 60: 60 second intervals.
+     * 
+     * If auto-save is off, then this value is 0 automatically. When auto-save
+     * is turned on, by default the value is 30.
+     * 
+     * @return auto-save frequency
      */
-     private void readSettings() {
-        File settingsFile = new File(appDirectory + "/settings.json");
-        if (!settingsFile.exists() && !settingsFile.isDirectory()) {
-            defaultSettings();
-            return;
-        }
-
-        // TODO: Read the settings from the settings file.
-     }
+    public int getAutoSaveFrequency() {
+        return autoSaveFrequency;
+    }
 
     /**
-     * Load the font from the resources folder in the user's system directory.
+     * Set the auto-save frequency, in seconds.
      * 
-     * @return int 0 if successful, 1 if the file does not exist.
+     * @param autoSaveFrequency
      */
-    private int loadFont(String fontName) {
-        // Load the font from the system directory.
-        String fontFilepath;
-        if(os.startsWith("windows"))
-            fontFilepath = System.getProperty("user.home") + 
-                            "\\AppData\\Local\\Microsoft\\Windows\\Fonts\\" +
-                            fontName + ".ttf";
-        else if(os.startsWith("mac"))
-            fontFilepath = "/Library/Fonts/" + fontName + ".ttf";
-        else
-            fontFilepath = "/usr/share/fonts/" + fontName + ".ttf";
-
-        // Register the font with the GraphicsEnvironment.
-        try {
-            GraphicsEnvironment ge = GraphicsEnvironment.
-                getLocalGraphicsEnvironment();
-
-            ge.registerFont(Font.createFont(
-                Font.TRUETYPE_FONT,
-                new File(fontFilepath)
-            ));
-
-            return 0;
-
-        } catch(IOException | FontFormatException e) {
-            System.out.println("Filepath of font not found: " +
-                                fontFilepath + " does not exist.");
-            return 1;
-        }
+    public void setAutoSaveFrequency(int autoSaveFrequency) {
+        this.autoSaveFrequency = autoSaveFrequency;
+        updateSettingsFile();
     }
 }

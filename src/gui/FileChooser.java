@@ -1,19 +1,17 @@
 package gui;
 
-import java.io.File;
+// GUI imports
+import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
-import gui.backend.Settings;
-
-import javax.swing.JFileChooser;
+// Processing & backend imports
+import java.io.File;
 
 /**
  * A custom FileChooser with the appropriate styling for the Sudoku app.
  * Additionally, this FileChooser only allows .sdku files to be selected.
  */
 public class FileChooser extends JFileChooser {
-    private Settings s;
-    
     /**
      * Create a new FileChooser with the default directory set to the user's
      * Sudoku directory.
@@ -21,9 +19,8 @@ public class FileChooser extends JFileChooser {
      * @param defaultDirectory
      * @param s
      */
-    public FileChooser(File defaultDirectory, Settings s) {
+    public FileChooser(File defaultDirectory) {
         super(defaultDirectory);
-        this.s = s;
 
         for (File f: defaultDirectory.listFiles()) {
             ensureFileIsVisible(f);
@@ -38,7 +35,6 @@ public class FileChooser extends JFileChooser {
      */
     private void style() {
         // TODO: Style the FileChooser.
-        setFont(s.getFont());
     }
 
     /**

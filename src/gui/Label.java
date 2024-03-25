@@ -11,9 +11,9 @@ import gui.backend.Theme;
  * The Note class represents a single note of a cell in the Sudoku board.
  * 
  * This is the GUI abstraction for the underlying Cell object, and is used to
- * display and manage the note for a cell.
+ * display and manage the note or value for a cell.
  */
-public class Note extends JLabel {
+public class Label extends JLabel {
     private Theme t;
     private Font f;
     
@@ -23,7 +23,7 @@ public class Note extends JLabel {
      * @param text
      * @param t
      */
-    public Note(String text, Theme t, Font f) {
+    public Label(String text, Theme t, Font f) {
         super(text, SwingConstants.CENTER);
         this.t = t;
         this.f = f;

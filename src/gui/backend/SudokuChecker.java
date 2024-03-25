@@ -12,6 +12,8 @@ import java.util.ArrayList;
  */
 public class SudokuChecker {
     private Cell[][] grid;
+    private Cell[][] origGrid;
+
     
     /**
      * Create a new SudokuChecker object, initializing the grid to the given
@@ -19,13 +21,60 @@ public class SudokuChecker {
      * inputs a value, or be used to check the validity of a puzzle when the 
      * user requests it.
      * 
-     * TODO: Currently, this class is not used in the GUI. It is only used in
-     * the command-line interface.
-     * 
      * @param grid
      */
     public SudokuChecker(Cell[][] grid) {
         this.grid = grid;
+
+        // Create a copy of the original grid to be used for resetting the
+        // grid to its original state.
+        origGrid = new Cell[9][9];
+        for(int i = 0; i < 9; i++) {
+            for(int j = 0; j < 9; j++) {
+                origGrid[i][j] = new Cell(i, j, grid[i][j].getValue());
+            }
+        }
+    }
+
+    /**
+     * Check if the given value can be placed in the given cell of the grid.
+     * 
+     * False means that the value is incorrect, and true means that the value
+     * is correct.
+     * 
+     * @param row
+     * @param col
+     * @param value
+     * @return boolean
+     */
+    public boolean checkValue(int row, int col, int value) {
+        // Check the row
+        for(int i = 0; i < 9; i++) {
+            if(grid[row][i].getValue() == value && i != col)
+                return false;
+        }
+
+        // Check the column
+        for(int i = 0; i < 9; i++) {
+            if(grid[i][col].getValue() == value && i != row)
+                return false;
+        }
+
+        // Check the box
+        int boxRow = row / 3;
+        int boxCol = col / 3;
+        for(int i = 0; i < 3; i++) {
+            for(int j = 0; j < 3; j++) {
+                if(
+                    grid[boxRow * 3 + i][boxCol * 3 + j].getValue() == value &&
+                    (boxRow * 3 + i != row || boxCol * 3 + j != col)
+                ) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -91,38 +140,12 @@ public class SudokuChecker {
     ) {
         ArrayList<Integer> intersection = new ArrayList<Integer>();
         for(int i = 0; i < a.size(); i++) {
-            if(b.contains(a.get(i))) {
+            if(b.contains(a.get(i)))
                 intersection.add(a.get(i));
-            }
         }
 
         return intersection;
     }
-
-    /**
-     * Determine what numbers are available to be placed in the given cell of
-     * the grid. This is effectively an union of the numbers available in the
-     * row, column, and box of the cell.
-     * 
-     * @param row
-     * @param col
-     */
-     private ArrayList<Integer> union(
-        ArrayList<Integer> a,
-        ArrayList<Integer> b
-     ) {
-        ArrayList<Integer> union = new ArrayList<Integer>();
-        for(int i = 0; i < a.size(); i++) {
-            union.add(a.get(i));
-        }
-        for(int i = 0; i < b.size(); i++) {
-            if(!union.contains(b.get(i))) {
-                union.add(b.get(i));
-            }
-        }
-
-        return union;
-     }
 
      /**
      * Determine what numbers are available to be placed in the given cell of
@@ -145,9 +168,9 @@ public class SudokuChecker {
             getBoxRemainingNumbers(row, col)
         );
 
-        if(intersection.size() == 0) {
+        if(intersection.size() == 0)
             return;
-        } else if(intersection.size() == 1) {
+        else if(intersection.size() == 1) {
             int value = intersection.get(0);
 
             grid[row][col].setValue(value);
@@ -156,9 +179,8 @@ public class SudokuChecker {
         } else {
             // Join the arrays and find the intersection of the three arrays.
             ArrayList<Integer> availableNumbers = new ArrayList<Integer>();
-            for(int i = 0; i < intersection.size(); i++) {
+            for(int i = 0; i < intersection.size(); i++)
                 availableNumbers.add(intersection.get(i));
-            }
 
             grid[row][col].setPossibleValues(
                 arrayListToArray(availableNumbers)
@@ -213,9 +235,8 @@ public class SudokuChecker {
         while(!isValidSolution()) {
             for(int i = 0; i < 9; i++) {
                 for(int j = 0; j < 9; j++) {
-                    if(grid[i][j].getValue() == 0) {
+                    if(grid[i][j].getValue() == 0)
                         getAvailableNumbers(i, j);
-                    }
                 }
             }
         }
@@ -239,9 +260,7 @@ public class SudokuChecker {
                     break;
                 }
             }
-            if(!found) {
-                remainingNumbers.add(i);
-            }
+            if(!found) remainingNumbers.add(i);
         }
 
         return remainingNumbers;
@@ -263,9 +282,8 @@ public class SudokuChecker {
                     break;
                 }
             }
-            if(!found) {
+            if(!found)
                 remainingNumbers.add(i);
-            }
         }
 
         return remainingNumbers;
@@ -293,9 +311,8 @@ public class SudokuChecker {
                     }
                 }
             }
-            if(!found) {
+            if(!found)
                 remainingNumbers.add(i);
-            }
         }
 
         return remainingNumbers;
@@ -312,9 +329,9 @@ public class SudokuChecker {
      */
     private int[] arrayListToArray(ArrayList<Integer> list) {
         int[] array = new int[list.size()];
-        for(int i = 0; i < list.size(); i++) {
+        for(int i = 0; i < list.size(); i++)
             array[i] = list.get(i);
-        }
+
         return array;
     }
 
@@ -331,17 +348,19 @@ public class SudokuChecker {
         // Check that every cell has a value between 1 and 9.
         for(int i = 0; i < 9; i++) {
             for(int j = 0; j < 9; j++) {
-                if(grid[i][j].getValue() < 1 || grid[i][j].getValue() > 9)
-                    return false;
+                if(
+                    grid[i][j].getValue() < 1 ||
+                    grid[i][j].getValue() > 9
+                ) return false;
             }
         }
         
         // Check that every row contains the numbers 1-9 exactly once.
         for(int i = 0; i < 9; i++) {
             int[] row = new int[9];
-            for(int j = 0; j < 9; j++) {
+            for(int j = 0; j < 9; j++)
                 row[j] = grid[i][j].getValue();
-            }
+
             if(!isValidSet(row)) {
                 System.out.println("Row " + i + " is invalid.");
                 return false;
@@ -351,9 +370,9 @@ public class SudokuChecker {
         // Check that every column contains the numbers 1-9 exactly once.
         for(int i = 0; i < 9; i++) {
             int[] col = new int[9];
-            for(int j = 0; j < 9; j++) {
+            for(int j = 0; j < 9; j++)
                 col[j] = grid[j][i].getValue();
-            }
+
             if(!isValidSet(col)) {
                 System.out.println("Column " + i + " is invalid.");
                 return false;
@@ -365,9 +384,8 @@ public class SudokuChecker {
             for(int j = 0; j < 3; j++) {
                 int[] box = new int[9];
                 for(int k = 0; k < 3; k++) {
-                    for(int l = 0; l < 3; l++) {
+                    for(int l = 0; l < 3; l++)
                         box[k * 3 + l] = grid[i * 3 + k][j * 3 + l].getValue();
-                    }
                 }
                 if(!isValidSet(box)) {
                     System.out.println(
@@ -393,13 +411,15 @@ public class SudokuChecker {
     private boolean isValidSet(int[] set) {
         boolean[] found = new boolean[9];
         for(int i = 0; i < 9; i++) {
-            if(set[i] < 1 || set[i] > 9) {
+            if(set[i] < 1 || set[i] > 9)
                 return false;
-            } else if(found[set[i] - 1]) {
+
+            else if(found[set[i] - 1])
                 return false;
-            } else {
+
+            else
                 found[set[i] - 1] = true;
-            }
+
         }
         return true;
     }
