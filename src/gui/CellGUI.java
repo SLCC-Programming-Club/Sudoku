@@ -65,7 +65,7 @@ class CellGUI extends JPanel {
         // Populate the cell with the appropriate value or notes.
         if(cell.getValue() == 0) {
             internalPanel.setLayout(noteLayout);
-            generateNotes(noteMode);
+            generateNotes(true);
         } else {
             internalPanel.setLayout(valueLayout);
             valueLabel.setText(Integer.toString(cell.getValue()));
@@ -130,7 +130,7 @@ class CellGUI extends JPanel {
     public void removeValue() {
         if(!selected) return;
 
-        cell.setValue(0, true);
+        cell.setValue(0, false);
         if(!cell.isInitValue())
             valueLabel.setText("");
 
