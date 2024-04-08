@@ -2,9 +2,8 @@ function Run {
     param(
         [string]$flag
     )
-    javac *.java
-    java App $flag
-    rm *.class
+    javac -d bin *.java
+    java -cp bin App $flag
 }
 
 if ($args.Length -eq 1) {
