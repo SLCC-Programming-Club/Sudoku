@@ -1,4 +1,4 @@
-package gui;
+package gui.backend;
 /**
  * A Cell represents a single cell in the Sudoku grid.
  * This helper class is used to store the row, column, value, and possible values for a cell.
@@ -11,6 +11,8 @@ public class Cell {
     private int col;
     private int box;
     private int value;
+    private boolean initValue;
+
     private List possibleValues;
     
     /**
@@ -41,6 +43,8 @@ public class Cell {
         this.row = row;
         this.col = col;
         this.value = value;
+        initValue = value != 0;
+
         setBox();
         possibleValues = new List();
     }
@@ -66,10 +70,16 @@ public class Cell {
      * 
      * The value must be between 1 and 9, inclusive.
      * 
+     * Additionally if the value is incorrect, then do not clear the
+     * possible values.
+     * 
      * @param value
+     * @param isCorrect
      */
-    public void setValue(int value) {
-        possibleValues.clear();
+    public void setValue(int value, boolean isCorrect) {
+        if(initValue) return;
+        if(isCorrect) possibleValues.clear();
+
         this.value = value;
     }
 
@@ -80,6 +90,24 @@ public class Cell {
      */
     public int getValue() {
         return value;
+    }
+
+    /**
+     * Get the row of the cell.
+     * 
+     * @return row number
+     */
+    public int getRow() {
+        return row;
+    }
+
+    /**
+     * Get the column of the cell.
+     * 
+     * @return column number
+     */
+    public int getCol() {
+        return col;
     }
 
     /**
@@ -99,7 +127,10 @@ public class Cell {
      * @param value
      */
     public void addPossibleValue(int value) {
+        if(initValue) return;
+
         if(possibleValues.contains(value)) {
+            removePossibleValue(value);
             return;
         } else if(value < 1 || value > 9) {
             return;
@@ -114,6 +145,8 @@ public class Cell {
      * @param possibleValues
      */
     public void setPossibleValues(int[] possibleValues) {
+        if(initValue) return;
+
         this.possibleValues = new List(possibleValues);
     }
 
@@ -133,14 +166,37 @@ public class Cell {
     /**
      * Get a list of possible values for the cell.
      * 
-     * This list is a copy of the cell's possible values, and is sorted in ascending order.
+     * This list is a copy of the cell's possible values, and is sorted 
+     * in ascending order.
      * 
      * @return list of possible values for the cell
      */
     public int[] getPossibleValues() {
         return possibleValues.toArray();
     }
-    
+
+    /**
+     * Check if the cell has an initial value.
+     * 
+     * An initial value is a value that is set when the cell is created,
+     * and cannot be changed.
+     * @return
+     */
+    public boolean isInitValue() {
+        return initValue;
+    }
+
+    public static Cell[][] copyGrid(Cell[][] grid) {
+        Cell[][] newGrid = new Cell[9][9];
+        for(int row = 0; row < 9; row++) {
+            for(int col = 0; col < 9; col++) {
+                newGrid[row][col] = new Cell(row, col, grid[row][col].getValue());
+            }
+        }
+
+        return newGrid;
+    }
+
     /**
      * Given the cell's row and column, set the box number for the cell.
      */
@@ -151,10 +207,12 @@ public class Cell {
     }
     
     /**
-     * This class is used to store the possible values for a cell in a sorted list.
-     * The list is sorted in ascending order, and the values are stored in a linked list.
+     * This class is used to store the possible values for a cell in a 
+     * sorted list. The list is sorted in ascending order, and the values are 
+     * stored in a linked list.
      * 
-     * The List class also contains a method to add a value to the list, and a method to get the list of values as an array.
+     * The List class also contains a method to add a value to the list, 
+     * and a method to get the list of values as an array.
      */
     private class List {
 
@@ -175,20 +233,6 @@ public class Cell {
             size = 0;
             max = 0;
             min = 0;
-        }
-
-        /**
-         * Create a new List with the given initial value.
-         * 
-         * By default, the head and tail are the same, the size is 1, and the max and min are the initial value.
-         * @param initValue
-         */
-        public List(int initValue) {
-            head = new Value(initValue);
-            tail = head;
-            size = 1;
-            max = initValue;
-            min = initValue;
         }
         
         /**

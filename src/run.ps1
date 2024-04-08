@@ -2,11 +2,8 @@ function Run {
     param(
         [string]$flag
     )
-    javac *.java
-    java App $flag
-    Remove-Item *.class
-    Remove-Item gui/*.class
-    Remove-Item gui/backend/*.class
+    javac -d bin *.java
+    java -cp bin App $flag
 }
 
 if ($args.Length -eq 1) {
