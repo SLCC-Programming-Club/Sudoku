@@ -185,8 +185,10 @@ public class Settings {
                             fontName + ".ttf";
         else if(os.startsWith("mac"))
             fontFilepath = "/Library/Fonts/" + fontName + ".ttf";
-        else
-            fontFilepath = "/usr/share/fonts/" + fontName + ".ttf";
+        else {
+            fontName = "HackNerdFontMono-Regular";
+            fontFilepath = "/usr/share/fonts/TTF/" + fontName + ".ttf";
+        }
 
         // Register the font with the GraphicsEnvironment.
         try {

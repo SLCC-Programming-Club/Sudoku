@@ -297,7 +297,7 @@ public class Nav extends JPanel {
      */
     private void openFile(String filename) {
     	//file path is not working for everyone had to append src/ to run
-        File f = new File("src/resources/" + filename + ".sdku");
+        File f = new File("resources/" + filename + ".sdku");
         // If the file does not exist, print an error message and return.
         if(f == null || !f.exists() || f.isDirectory() || !f.canRead()) {
             System.out.println(
