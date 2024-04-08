@@ -3,6 +3,7 @@ function run() {
         # Compile the program
         javac -d bin *.java
         java -cp bin App
+        rm -rf bin
     else
         case $1 in
             "-c" | "--cli")
