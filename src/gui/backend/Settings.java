@@ -189,10 +189,7 @@ public class Settings {
             fontName = "HackNerdFontMono-Regular";
             fontFilepath = "/usr/share/fonts/TTF/" + fontName + ".ttf";
         }
-<<<<<<< HEAD
 
-=======
->>>>>>> main
         // Register the font with the GraphicsEnvironment.
         try {
             GraphicsEnvironment ge = GraphicsEnvironment.
